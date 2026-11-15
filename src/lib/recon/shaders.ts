@@ -21,7 +21,7 @@ void main(){
   vec3 n = normalize(vNormalW); vec3 day = texture2D(uDay, vUv).rgb;
   // regional tile: analytic lon/lat from the local position (Y-up globe frame), feathered at the footprint edges
   vec3 p = normalize(vPosL); float lon = atan(-p.z, p.x); float lat = asin(clamp(p.y, -1.0, 1.0));
-  vec2 ruv = vec2((lon - uRegionBox.x) / (uRegionBox.y - uRegionBox.x), (lat - uRegionBox.z) / (uRegionBox.w - uRegionBox.z));
+  vec2 ruv = vec2((lon - uRegionBox.x) / (uRegionBox.y - uRegionBox.x), 1.0 - (lat - uRegionBox.z) / (uRegionBox.w - uRegionBox.z)); // textures are not Y-flipped (glTF/KTX2 convention): v=0 is north
   float inside = ss(0.0, 0.04, ruv.x) * ss(0.0, 0.04, 1.0 - ruv.x) * ss(0.0, 0.04, ruv.y) * ss(0.0, 0.04, 1.0 - ruv.y);
   vec3 reg = texture2D(uRegion, clamp(ruv, 0.0, 1.0)).rgb; day = mix(day, reg, inside * uRegionMix);
   float ndl = dot(n, uSunDir); vec3 col;
@@ -87,7 +87,7 @@ void main(){
 export const CLOUD_BAKE_VERT = /* glsl */ `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
 export const CLOUD_BAKE_FRAG = /* glsl */ `
 varying vec2 vUv; uniform float uCover;
-float h(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+float h(vec3 p){ vec3 q = fract(p * 0.1031); q += dot(q, q.zyx + 31.32); return fract((q.x + q.y) * q.z); }
 float nz(vec3 x){ vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
   return mix(mix(mix(h(i), h(i + vec3(1,0,0)), f.x), mix(h(i + vec3(0,1,0)), h(i + vec3(1,1,0)), f.x), f.y), mix(mix(h(i + vec3(0,0,1)), h(i + vec3(1,0,1)), f.x), mix(h(i + vec3(0,1,1)), h(i + vec3(1,1,1)), f.x), f.y), f.z); }
 float fbm(vec3 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 6; i++) { s += a * nz(p); p *= 2.03; a *= 0.5; } return s; }

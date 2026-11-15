@@ -17,7 +17,10 @@ export function drive(mixer: THREE.AnimationMixer, actions: Record<string, THREE
   } else mixer.timeScale = playing ? 1 : 0;
 }
 export function fitCamera(cam: THREE.PerspectiveCamera, w: number, h: number, shift: number) {
-  cam.aspect = w / h; if (shift) cam.setViewOffset(w, h, shift * w, 0, w, h); else cam.clearViewOffset(); cam.updateProjectionMatrix();
+  // GLB camera is authored for 16:9. For narrower (portrait) viewports keep the 16:9 HORIZONTAL field of view so the framing (Kingdom in view) survives.
+  const base = (cam.userData.baseFov ??= cam.fov) as number; const aspect = w / h; const wide = 16 / 9;
+  cam.fov = aspect >= wide ? base : THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(base) / 2) * (wide / aspect)));
+  cam.aspect = aspect; if (shift) cam.setViewOffset(w, h, shift * w, 0, w, h); else cam.clearViewOffset(); cam.updateProjectionMatrix();
 }
 export function playAll(actions: Record<string, THREE.AnimationAction | null>, names: string[]) { names.forEach(n => actions[n]?.reset().play()); }
 export const LAYERS = ['EARTH_SURFACE', 'OCEANS', 'CLOUDS', 'ATMOSPHERE', 'NIGHT_LIGHTS', 'SAUDI_BORDER', 'NETWORK (nodes+links)'] as const;

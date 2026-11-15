@@ -3,35 +3,43 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { COL, CITIES, GLB_SECONDS, NOTEX_GLB, R, REGION, TEX_BASE, TIER_SETS, lonLatToVec3, pickTier, type Tier } from '@/lib/recon/config';
+import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
+import { COL, CITIES, GLB_SECONDS, NOTEX_GLB, R, REGION, TEX_BASE, TIER_SETS_KTX2, TIER_SETS_WEBP, lonLatToVec3, pickTier, type Tier } from '@/lib/recon/config';
 import { ATMO_FRAG, BORDER_FRAG, BORDER_VERT, CLOUD_BAKE_FRAG, CLOUD_BAKE_VERT, CLOUD_FRAG, EARTH_FRAG, NIGHT_FRAG, OCEAN_FRAG, VERT } from '@/lib/recon/shaders';
 import { drive, fitCamera, playAll } from '@/lib/glbOps';
 
 export type ReconStats = { fps: number; avgMs: number; p95Ms: number; maxMs: number; spikes33: number; frames: number; calls: number; triangles: number; geometries: number; textures: number; programs: number; maxTex: number; gpu: string; camera: string; tier: string; quality: string };
 declare global { interface Window { __recon?: { stats: () => ReconStats | null; ready: boolean; timings: Record<string, number>; resetFrames: () => void; log: unknown[]; renderer?: THREE.WebGLRenderer } } }
 export type ReconProps = {
-  stage?: number; tier?: string | null; progress?: number | null; progressRef?: React.RefObject<number>; still?: boolean; progressive?: boolean; exposure?: number;
+  stage?: number; tier?: string | null; format?: string | null; progress?: number | null; progressRef?: React.RefObject<number>; still?: boolean; progressive?: boolean; exposure?: number;
   registry?: React.RefObject<Map<string, HTMLElement>>; onReady?: () => void; onStatus?: (s: string) => void; onStats?: (s: ReconStats) => void; sunI?: number;
 };
 const ss = (a: number, b: number, x: number) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 /** Mutation helper (kept outside components so refs passed down as props can be updated). */
 function setRef<T>(r: { current: T }, v: T) { r.current = v; }
 function setUniform(m: THREE.ShaderMaterial, k: string, v: unknown) { m.uniforms[k].value = v; }
+export const sceneInfo = { calls: 0, triangles: 0 };
 function renderHdr(gl: THREE.WebGLRenderer, rt: THREE.WebGLRenderTarget, scene: THREE.Scene, camera: THREE.Camera, pass: { mat: THREE.ShaderMaterial; sc: THREE.Scene; cam: THREE.Camera }) {
-  gl.setRenderTarget(rt); gl.render(scene, camera); gl.setRenderTarget(null); setUniform(pass.mat, 'tDiffuse', rt.texture); gl.render(pass.sc, pass.cam);
+  gl.info.autoReset = false; gl.info.reset(); gl.setRenderTarget(rt); gl.render(scene, camera); sceneInfo.calls = gl.info.render.calls; sceneInfo.triangles = gl.info.render.triangles; gl.setRenderTarget(null); setUniform(pass.mat, 'tDiffuse', rt.texture); gl.render(pass.sc, pass.cam);
 }
 const nextFrame = () => new Promise<void>(r => requestAnimationFrame(() => r()));
 
-async function loadTex(url: string, gl: THREE.WebGLRenderer, srgb: boolean, flipY: boolean): Promise<THREE.Texture> {
-  const img = new Image(); img.decoding = 'async'; img.src = url; await img.decode();
-  const t = new THREE.Texture(img); t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace; t.flipY = flipY; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter;
+/** WebP/PNG via ImageBitmap (decoded off the main thread, cheap upload). Textures are NOT Y-flipped (glTF convention: v=0 is the top/north). */
+async function loadBitmapTex(url: string, gl: THREE.WebGLRenderer, srgb: boolean): Promise<THREE.Texture> {
+  let src: ImageBitmap | HTMLImageElement;
+  try { src = await createImageBitmap(await (await fetch(url)).blob(), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' }); } catch { const img = new Image(); img.decoding = 'async'; img.src = url; await img.decode(); src = img; }
+  const t = new THREE.Texture(src as unknown as HTMLImageElement); t.flipY = false; t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter;
   t.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy()); t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.ClampToEdgeWrapping; t.needsUpdate = true; return t;
+}
+async function loadTex(url: string, gl: THREE.WebGLRenderer, srgb: boolean, ktx2: KTX2Loader): Promise<THREE.Texture> {
+  if (url.endsWith('.ktx2')) { const t = await ktx2.loadAsync(url); t.anisotropy = Math.min(8, gl.capabilities.getMaxAnisotropy()); t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.ClampToEdgeWrapping; return t; }
+  return loadBitmapTex(url, gl, srgb);
 }
 type Assets = { day: THREE.Texture; night: THREE.Texture; mask: THREE.Texture; region: THREE.Texture | null; cloud: THREE.Texture; quality: Tier };
 
 function bakeClouds(gl: THREE.WebGLRenderer, size: number): THREE.Texture {
   const rt = new THREE.WebGLRenderTarget(size, size / 2, { format: THREE.RGBAFormat, type: THREE.UnsignedByteType, minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, generateMipmaps: true, depthBuffer: false });
-  const mat = new THREE.ShaderMaterial({ vertexShader: CLOUD_BAKE_VERT, fragmentShader: CLOUD_BAKE_FRAG, uniforms: { uCover: { value: 0.53 } }, depthTest: false });
+  const mat = new THREE.ShaderMaterial({ vertexShader: CLOUD_BAKE_VERT, fragmentShader: CLOUD_BAKE_FRAG, uniforms: { uCover: { value: 0.60 } }, depthTest: false });
   const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); const sc = new THREE.Scene(); sc.add(quad); const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const prev = gl.getRenderTarget(); const prevTM = gl.toneMapping; gl.toneMapping = THREE.NoToneMapping; gl.setRenderTarget(rt); gl.render(sc, cam); gl.setRenderTarget(prev); gl.toneMapping = prevTM;
   quad.geometry.dispose(); mat.dispose(); const t = rt.texture; t.wrapS = THREE.RepeatWrapping; t.anisotropy = 4; return t;
@@ -42,7 +50,7 @@ function Probe({ onStats, tier, qualityRef }: { onStats?: (s: ReconStats) => voi
   useEffect(() => {
     const c = gl.getContext(); const ext = c.getExtension('WEBGL_debug_renderer_info'); maxTex.current = c.getParameter(c.MAX_TEXTURE_SIZE) as number; gpu.current = ext ? (c.getParameter(ext.UNMASKED_RENDERER_WEBGL) as string) : 'n/a';
     const mk = (): ReconStats | null => { const a = dts.current.slice(); if (a.length < 5) return null; const s = [...a].sort((x, y) => x - y); const avg = a.reduce((p, q) => p + q, 0) / a.length; const cam = getState().camera as THREE.PerspectiveCamera;
-      return { fps: +(1000 / avg).toFixed(1), avgMs: +avg.toFixed(2), p95Ms: +s[Math.floor(s.length * 0.95)].toFixed(1), maxMs: +s[s.length - 1].toFixed(1), spikes33: a.filter(v => v > 33.4).length, frames: a.length, calls: gl.info.render.calls, triangles: gl.info.render.triangles,
+      return { fps: +(1000 / avg).toFixed(1), avgMs: +avg.toFixed(2), p95Ms: +s[Math.floor(s.length * 0.95)].toFixed(1), maxMs: +s[s.length - 1].toFixed(1), spikes33: a.filter(v => v > 33.4).length, frames: a.length, calls: sceneInfo.calls, triangles: sceneInfo.triangles,
         geometries: gl.info.memory.geometries, textures: gl.info.memory.textures, programs: gl.info.programs?.length ?? 0, maxTex: maxTex.current, gpu: gpu.current, tier, quality: qualityRef.current ?? '',
         camera: `${cam.name || cam.type} fov=${cam.fov?.toFixed(1)} pos=${cam.getWorldPosition(new THREE.Vector3()).toArray().map(v => v.toFixed(2)).join(',')}` }; };
     const prev = window.__recon; window.__recon = { stats: mk, ready: prev?.ready ?? false, timings: prev?.timings ?? {}, resetFrames: () => { dts.current = []; }, log: prev?.log ?? [], renderer: gl };
@@ -58,21 +66,21 @@ function Earth(p: ReconProps & { tier: Tier; qualityRef: React.RefObject<string>
   const [assets, setAssets] = useState<Assets | null>(null); const mats = useRef<Record<string, THREE.ShaderMaterial>>({}); const shift = useRef<number[] | null>(null);
   const objs = useRef<{ clouds?: THREE.Mesh; border?: THREE.Mesh; outline?: THREE.Mesh; markers?: THREE.Points; sunDir: THREE.Vector3; cam?: THREE.PerspectiveCamera; markerPos: THREE.Vector3[] }>({ sunDir: new THREE.Vector3(0, 0, 1), markerPos: [] });
   const stageRef = useRef(6); const stageProp = p.stage ?? 6; useEffect(() => { setRef(stageRef, stageProp); }, [stageProp]); const timings = useRef<Record<string, number>>({});
-  const origCam = useRef<THREE.Camera | null>(null);
+  const origCam = useRef<THREE.Camera | null>(null); const ktx2Ref = useRef<KTX2Loader | null>(null);
 
   // ---------- assets: low tier first (fast first frame), then upgrade to the device tier ----------
   useEffect(() => {
-    let dead = false; const T = TIER_SETS; const t0 = performance.now();
-    const load = async (tier: Tier): Promise<Assets> => { const s = T[tier]; const [day, night, mask, region] = await Promise.all([loadTex(TEX_BASE + s.day, gl, true, false), loadTex(TEX_BASE + s.night, gl, true, false), loadTex(TEX_BASE + s.mask, gl, false, false), s.region ? loadTex(TEX_BASE + s.region, gl, true, true) : Promise.resolve(null)]);
-      if (region) region.wrapS = THREE.ClampToEdgeWrapping; const tb = performance.now(); const cloud = bakeClouds(gl, s.cloud); timings.current[`bake_${tier}_ms`] = Math.round(performance.now() - tb);
+    let dead = false; const T = p.format === 'webp' ? TIER_SETS_WEBP : TIER_SETS_KTX2; const t0 = performance.now(); const ktx2 = new KTX2Loader().setTranscoderPath('/basis/').detectSupport(gl); ktx2Ref.current = ktx2;
+    const load = async (tier: Tier): Promise<Assets> => { const s = T[tier]; const [day, night, mask, region] = await Promise.all([loadTex(TEX_BASE + s.day, gl, true, ktx2), loadTex(TEX_BASE + s.night, gl, true, ktx2), loadTex(TEX_BASE + s.mask, gl, false, ktx2), s.region ? loadTex(TEX_BASE + s.region, gl, true, ktx2) : Promise.resolve(null)]);
+      if (region) region.wrapS = THREE.ClampToEdgeWrapping; timings.current[`tex_${tier}_ms`] = Math.round(performance.now() - t0); const tb = performance.now(); const cloud = bakeClouds(gl, s.cloud); timings.current[`bake_${tier}_ms`] = Math.round(performance.now() - tb);
       for (const t of [day, night, mask, region, cloud]) if (t) { gl.initTexture(t); await nextFrame(); } // upload one texture per frame -> no single long frame
       return { day, night, mask, region, cloud, quality: tier }; };
     (async () => {
       const first: Tier = p.progressive === false ? p.tier : 'low'; const a = await load(first); if (dead) return; timings.current.firstAssetsMs = Math.round(performance.now() - t0); setAssets(a); setRef(p.qualityRef, a.quality);
       if (first !== p.tier) { const b = await load(p.tier); if (dead) return; timings.current.upgradeMs = Math.round(performance.now() - t0); setAssets(prev => { if (prev) [prev.day, prev.night, prev.mask, prev.region, prev.cloud].forEach(t => t?.dispose()); return b; }); setRef(p.qualityRef, b.quality); }
     })();
-    return () => { dead = true; };
-  }, [gl, p.tier, p.progressive, p.qualityRef]);
+    return () => { dead = true; ktx2.dispose(); };
+  }, [gl, p.tier, p.progressive, p.qualityRef, p.format]);
 
   // ---------- build materials / hide the incorrectly-opaque layers ----------
   useEffect(() => {
@@ -156,14 +164,15 @@ function Composer({ exposure, samples }: { exposure: number; samples: number }) 
 }
 
 export function ReconCanvas(props: ReconProps) {
-  const [tier, setTier] = useState<Tier | null>(null); const qualityRef = useRef('loading');
+  const [tier, setTier] = useState<Tier | null>(null); const [fmt, setFmt] = useState<string | null>(null); const qualityRef = useRef('loading');
   const [probeKey] = useState(0);
   return (
     <Canvas dpr={tier === 'low' ? [1, 1.5] : [1, 2]} camera={{ position: [0, 6, 26], fov: 35, near: 0.05, far: 500 }} gl={{ antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true }} flat
       onCreated={({ gl }) => { gl.toneMapping = THREE.AgXToneMapping; gl.toneMappingExposure = 1; gl.setClearColor(COL.charcoal.clone(), 1); const q = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-        const maxTex = gl.capabilities.maxTextureSize; setTier(pickTier(maxTex, { coarse: window.matchMedia('(pointer: coarse)').matches, deviceMemory: (navigator as Navigator & { deviceMemory?: number }).deviceMemory, override: props.tier ?? q?.get('tier') })); }}>
+        const maxTex = q?.get('maxtex') ? +(q.get('maxtex') as string) : gl.capabilities.maxTextureSize; const nav = navigator as Navigator & { deviceMemory?: number; connection?: { downlink?: number } };
+        setFmt(props.format ?? q?.get('fmt') ?? (maxTex < 4096 ? 'webp' : 'ktx2')); setTier(pickTier(maxTex, { coarse: window.matchMedia('(pointer: coarse)').matches, deviceMemory: nav.deviceMemory, downlink: nav.connection?.downlink, override: props.tier ?? q?.get('tier') })); }}>
       <color attach="background" args={['#1E1E14']} />
-      {tier && <Suspense fallback={null}><Earth {...props} tier={tier} qualityRef={qualityRef} /></Suspense>}
+      {tier && fmt && <Suspense fallback={null}><Earth {...props} format={fmt} tier={tier} qualityRef={qualityRef} /></Suspense>}
       {tier && <Composer exposure={props.exposure ?? 1} samples={tier === 'low' ? 0 : 4} />}
       {tier && <Probe key={probeKey} onStats={props.onStats} tier={tier} qualityRef={qualityRef} />}
     </Canvas>

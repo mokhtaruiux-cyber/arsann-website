@@ -27,7 +27,7 @@ export default function ReconPage() {
   return (
     <div dir={c.dir} style={{ fontFamily: 'system-ui, sans-serif', color: '#D7D7C8', background: '#1E1E14' }}>
       <div className="fixed inset-0 z-0">
-        <ReconCanvas stage={stage} tier={q.get('tier')} progressRef={progress} still={q.get('still') === '1'} progressive={q.get('progressive') !== '0'} registry={registry} onReady={() => setReady(true)} onStats={setStats} exposure={q.get('exp') ? +(q.get('exp') as string) : 1} />
+        <ReconCanvas stage={stage} tier={q.get('tier')} format={q.get('fmt')} progressRef={progress} still={q.get('still') === '1'} progressive={q.get('progressive') !== '0'} registry={registry} onReady={() => setReady(true)} onStats={setStats} exposure={q.get('exp') ? +(q.get('exp') as string) : 1} />
         {!nolabels && <CityLabels registry={registry} lang={lang} />}
       </div>
       {!ready && <div className="fixed inset-0 z-20 grid place-items-center bg-[#1E1E14] text-sm" role="status" aria-live="polite">{lang === 'en' ? 'Preparing Earth…' : 'جارٍ تجهيز الأرض…'}</div>}

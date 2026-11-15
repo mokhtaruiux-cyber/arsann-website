@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // cacheComponents/partialPrefetching DISABLED for the 3D routes: with them ON, Next 16 keeps the previous route mounted (Activity) so the WebGL context is never released.
+  cacheComponents: false,
   turbopack: {
     rules: {
       "*.css": {

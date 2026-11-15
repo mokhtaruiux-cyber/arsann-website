@@ -18,7 +18,7 @@ export default function VisualReview() {
         <span className="opacity-60">Reference frames contain no city labels; the right side shows the provisional HTML labels (add &amp;nolabels=1 to hide).</span></div>
       <div className="grid grid-cols-2 gap-3">
         <figure><div className="relative aspect-video overflow-hidden bg-black"><Image unoptimized fill alt={`Blender ${p}%`} src={`/reference/brand_p${String(p).padStart(3, '0')}.png`} className="object-cover" /></div><figcaption className="mt-1 text-xs">Blender Cycles reference — {p}%</figcaption></figure>
-        <figure><div className="relative aspect-video overflow-hidden" data-testid="recon-box"><ReconCanvas stage={6} tier={q.get('tier')} progressRef={progress} still progressive={false} registry={registry} />{q.get('nolabels') !== '1' && <CityLabels registry={registry} lang="en" />}</div><figcaption className="mt-1 text-xs">Reconstructed real-time scene — {p}% (tier {q.get('tier') ?? 'auto'})</figcaption></figure>
+        <figure><div className="relative aspect-video overflow-hidden" data-testid="recon-box"><ReconCanvas stage={6} tier={q.get('tier')} format={q.get('fmt')} progressRef={progress} still progressive={false} registry={registry} />{q.get('nolabels') !== '1' && <CityLabels registry={registry} lang="en" />}</div><figcaption className="mt-1 text-xs">Reconstructed real-time scene — {p}% (tier {q.get('tier') ?? 'auto'})</figcaption></figure>
       </div>
     </main>
   );

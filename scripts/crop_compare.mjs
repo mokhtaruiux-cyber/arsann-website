@@ -1,0 +1,8 @@
+// 1:1 pixel crops of the Saudi close-up (p100) from Blender and each web tier, side by side.
+import { chromium } from '@playwright/test'; import fs from 'node:fs';
+const b64 = f => fs.readFileSync(f).toString('base64'); const [x, y, w, h] = [760, 400, 640, 300];
+const items = [['Blender Cycles', 'public/reference/brand_p100.png'], ['Web high (KTX2, region 3584)', 'shots/review_high_ktx2/recon_p100.png'], ['Web medium (KTX2, region 2048)', 'shots/review_medium_ktx2/recon_p100.png'], ['Web low (KTX2 ETC1S, global only)', 'shots/review_low_ktx2/recon_p100.png'], ['Web high (WebP RGBA)', 'shots/review_high_webp/recon_p100.png']];
+const html = `<body style="margin:0;background:#111;color:#ddd;font:12px system-ui"><div style="display:grid;grid-template-columns:repeat(2,${w}px);gap:8px;padding:8px">${items.map(([t], i) => `<div><div>${t}</div><canvas id="c${i}" width="${w}" height="${h}"></canvas></div>`).join('')}</div>`;
+const browser = await chromium.launch({ channel: 'chrome', headless: true }); const page = await browser.newPage({ viewport: { width: w * 2 + 40, height: (h + 24) * 3 + 40 } }); await page.setContent(html);
+await page.evaluate(async ([list, x, y, w, h]) => { for (let i = 0; i < list.length; i++) { const img = new Image(); await new Promise(r => { img.onload = r; img.src = 'data:image/png;base64,' + list[i]; }); document.getElementById('c' + i).getContext('2d').drawImage(img, x, y, w, h, 0, 0, w, h); } }, [items.map(i => b64(i[1])), x, y, w, h]);
+await page.screenshot({ path: 'shots/crop_compare_p100.png', fullPage: true }); await browser.close(); console.log('ok');

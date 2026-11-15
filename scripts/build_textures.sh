@@ -14,5 +14,6 @@ cwebp -quiet -lossless -z 6 -resize 2048 1024 $S/land_mask_4k.png -o $T/landmask
 cwebp -quiet -lossless -z 6 $S/land_mask_4k.png -o $T/landmask_4096.webp
 # regional day: lon 30..62E, lat 8..38N from tile C1 (lon0-90E, lat0-90N, 240 px/deg): x=lon*240, y=(90-lat)*240
 cwebp -quiet -q 86 -crop 7200 12480 7680 7200 -resize 4096 3840 $S/bmng_day_C1_21600x21600.jpg -o $T/day_region_4096.webp
+cwebp -quiet -q 86 -crop 7200 12480 7680 7200 -resize 3584 3360 $S/bmng_day_C1_21600x21600.jpg -o $T/day_region_3584.webp
 cwebp -quiet -q 86 -crop 7200 12480 7680 7200 -resize 2048 1920 $S/bmng_day_C1_21600x21600.jpg -o $T/day_region_2048.webp
 ls -la $T
