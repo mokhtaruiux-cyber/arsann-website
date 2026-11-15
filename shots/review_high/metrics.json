@@ -1,0 +1,51 @@
+{
+ "tier": "high",
+ "results": [
+  {
+   "p": 0,
+   "maeR": 3.2,
+   "maeG": 3,
+   "maeB": 3.9,
+   "mae": 3.4,
+   "lumBlender": 30.7,
+   "lumWeb": 31.5
+  },
+  {
+   "p": 40,
+   "maeR": 7.1,
+   "maeG": 7.4,
+   "maeB": 8.2,
+   "mae": 7.6,
+   "lumBlender": 76.3,
+   "lumWeb": 79.4
+  },
+  {
+   "p": 65,
+   "maeR": 7.7,
+   "maeG": 8.3,
+   "maeB": 9.5,
+   "mae": 8.5,
+   "lumBlender": 107.5,
+   "lumWeb": 111.7
+  },
+  {
+   "p": 85,
+   "maeR": 6.2,
+   "maeG": 7.5,
+   "maeB": 9.4,
+   "mae": 7.7,
+   "lumBlender": 110.5,
+   "lumWeb": 115.8
+  },
+  {
+   "p": 100,
+   "maeR": 5.8,
+   "maeG": 7.2,
+   "maeB": 9.2,
+   "mae": 7.4,
+   "lumBlender": 113,
+   "lumWeb": 117.8
+  }
+ ],
+ "errs": []
+}
