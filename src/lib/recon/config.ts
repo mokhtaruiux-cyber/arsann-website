@@ -10,7 +10,7 @@ type TexSet = { day: string; night: string; mask: string; region: string | null;
 export const TIER_SETS_KTX2: Record<Tier, TexSet> = {
   low: { day: 'day_global_4096.etc1s.ktx2', night: 'night_global_4096.etc1s.ktx2', mask: 'landmask_2048.webp', region: null, cloud: 1024 },
   medium: { day: 'day_global_4096.ktx2', night: 'night_global_4096.etc1s.ktx2', mask: 'landmask_2048.webp', region: 'day_region_2048.ktx2', cloud: 2048 },
-  high: { day: 'day_global_4096.ktx2', night: 'night_global_4096.ktx2', mask: 'landmask_4096.webp', region: 'day_region_3584.ktx2', cloud: 4096 },
+  high: { day: 'day_global_4096.ktx2', night: 'night_global_4096.ktx2', mask: 'landmask_2048.webp', region: 'day_region_3584.ktx2', cloud: 4096 },
 };
 /** WebP sets (decoded to RGBA on the GPU) — kept for comparison and as a no-KTX2 fallback. */
 export const TIER_SETS_WEBP: Record<Tier, TexSet> = {
