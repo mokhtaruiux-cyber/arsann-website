@@ -10,5 +10,5 @@ node scripts/perf.mjs                           # desktop measurements → expor
 node scripts/inspect_glb.mjs public/models/scene01/scene01_origin.glb
 /Applications/Blender.app/Contents/MacOS/Blender -b export/scene01_export_copy.blend -P scripts/export_glb.py   # re-export (canonical: SCENE mode)
 ```
-Routes: `/scene01-test`, `/scene01-compare`, `/scene01-scroll-test`. Reports: `SCENE01_GLB_EXPORT_REPORT.md`, `SCENE01_WEB_BASELINE_RESULTS.md`, `ARSANN_3D_PIPELINE_RECOMMENDATION.md`.
+Routes: `/scene01-test`, `/scene01-compare`, `/scene01-scroll-test` (baseline), **`/scene01-recon`**, **`/scene01-visual-review`** (reconstruction). Reports: `SCENE01_*` and `ARSANN_3D_PIPELINE_RECOMMENDATION.md`; reconstruction notes in `SCENE01_REALTIME_RECONSTRUCTION.md`, `SCENE01_VISUAL_COMPARISON.md`, `SCENE01_PERFORMANCE.md`.
 Chrome for Playwright is the system Chrome (`channel: 'chrome'`); no browser was downloaded. Next 16 note: `AGENTS.md` (generated) asks to read `node_modules/next/dist/docs` before writing code.
