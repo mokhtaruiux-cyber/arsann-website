@@ -1,0 +1,58 @@
+00:00.434  blend            | Read blend: "/Users/mokhtar/ARSANN/arsann-scene01-glb-poc/export/scene01_export_copy.blend"
+BlenderMCP addon registered
+INFO Draco is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_draco_bridge.dylib
+INFO MeshOptimizer is available, use library at /Applications/Blender.app/Contents/Resources/5.2/scripts/addons_core/io_scene_gltf2/libbf_intern_meshopt_bridge.dylib
+13:53:45 | INFO: Starting glTF 2.0 export
+13:53:45 | INFO: Extracting primitive: Sphere.003
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.002
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: LINK_01
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: LINK_02
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: LINK_03
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: LINK_04
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: LINK_05
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: LINK_06
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: LINK_07
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: LINK_08
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.004
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.006
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.007
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.008
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.009
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.010
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.011
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.012
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.013
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.005
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: Sphere.001
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Extracting primitive: SAUDI_BORDER
+13:53:45 | INFO: Primitives created: 1
+13:53:45 | INFO: Finished glTF 2.0 export in 0.4389948844909668 s
+
+EXPORT_RESULT {'FINISHED'} 0.5 s 11596028
+BlenderMCP addon unregistered
+Blender 5.2.3 LTS (hash e13b728c6880 built 2026-10-22 01:31:22)
+
+Blender quit
