@@ -15,7 +15,7 @@ export function Scene03Content({ lang }: { lang: Lang }) {
   useEffect(() => {
     const el = root.current; if (!el) return;
     const photos = Array.from(el.querySelectorAll<HTMLElement>('[data-photo]')); const blocks = Array.from(el.querySelectorAll<HTMLElement>('[data-shot]')); const ticks = Array.from(el.querySelectorAll<HTMLElement>('[data-tick]'));
-    const scrim = el.querySelector<HTMLElement>('[data-scrim]'); const ui = el.querySelector<HTMLElement>('[data-ui]');
+    const scrim = el.querySelector<HTMLElement>('[data-scrim]'); const sun = el.querySelector<HTMLElement>('[data-sun]'); const ui = el.querySelector<HTMLElement>('[data-ui]');
     const apply = () => {
       const p3 = scene03Progress.ref.current, p4 = scene04Progress.ref.current;
       el.style.visibility = p3 > 0 ? 'visible' : 'hidden';
@@ -27,7 +27,8 @@ export function Scene03Content({ lang }: { lang: Lang }) {
           if (sh.subAt) { const sub = bl.querySelector<HTMLElement>('[data-sub]'); if (sub) { const so = ss(sh.subAt[0], sh.subAt[1], p); sub.style.opacity = String(so); sub.style.transform = `translate3d(0, ${((1 - so) * 12).toFixed(1)}px, 0)`; } }
         }
       });
-      if (scrim) scrim.style.opacity = String(Math.max(ss(0.16, 0.3, p3), ss(0, 0.06, p4) * 0.5));
+      el.dataset.car = p4 > 0 ? 'true' : 'false'; if (scrim) scrim.style.opacity = String(Math.max(ss(0.16, 0.3, p3) * (1 - ss(0, 0.06, p4)), ss(0, 0.06, p4) * 0.34));
+      if (sun) sun.style.opacity = String(ss(0, 0.1, p4) * (1 - ss(0.58, 0.68, p4)));   // warm midday sun over the daylight part of the drive, gone inside the garage
       let cur = 0; SCENE3_SHOTS.forEach((sh, i) => { const p = sh.scene === 3 ? p3 : p4; if (p >= sh.at[0] && (sh.scene === 3 || p4 > 0)) cur = i; }); ticks.forEach((t, i) => { t.dataset.active = String(i === cur); });
       if (ui) ui.style.opacity = String(ss(0.0, 0.08, p3));
     };
@@ -43,6 +44,7 @@ export function Scene03Content({ lang }: { lang: Lang }) {
     <div ref={root} className="s03-root" dir={d.dir} lang={lang} style={{ visibility: 'hidden' }}>
       {SCENE3_SHOTS.filter(s => s.img).map(s => <div key={s.id} data-photo={s.id} className="s03-photo" style={{ backgroundImage: `url(${asset(s.img as string)})`, backgroundPosition: s.pos, opacity: 0, visibility: 'hidden' }} aria-hidden="true" />)}
       <Scene04Car />
+      <div data-sun className="s04-sun" aria-hidden="true" style={{ opacity: 0 }} />
       <div data-scrim className="s03-scrim" aria-hidden="true" />
       {SCENE3_SHOTS.map(s => {
         const t = s[lang]; return (
