@@ -1,6 +1,6 @@
 'use client';
 import { Component, type ReactNode, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import dynamic from 'next/dynamic';
+import { ExperienceCanvas } from './ExperienceCanvas';   // static import: three.js + the canvas ride in the first parallel JS download instead of a second, later request (the canvas only ever renders on the client: `enabled` is false on the server)
 import { ScrollController } from './ScrollController';
 import { Scene01Content } from './Scene01Content';
 import { SceneLabels } from './SceneLabels';
@@ -16,7 +16,6 @@ import { Scene02Content } from './Scene02Content';
 import { Scene02Dive } from './Scene02Dive';
 import { readVariant } from '@/lib/recon/variant';
 
-const ExperienceCanvas = dynamic(() => import('./ExperienceCanvas').then(m => m.ExperienceCanvas), { ssr: false });
 let webglOk: boolean | null = null;
 function hasWebGL() {
   if (webglOk === null) {
@@ -58,14 +57,14 @@ export function Scene01Experience({ lang }: { lang: Lang }) {
 }
 
 function Scene01Live({ lang, enabled, onFallback }: { lang: Lang; enabled: boolean; onFallback: (reason: FallbackReason) => void }) {
-  const [compact, setCompact] = useState(false); useEffect(() => { setCompact(isCompact()); }, []); const L = lengths(compact); const [ready, setReady] = useState(false); const [earthPaused, setEarthPaused] = useState(false); const [variant] = useState(() => readVariant());
+  const [compact, setCompact] = useState(false); useEffect(() => { setCompact(isCompact()); }, []); const L = lengths(compact); const [ready, setReady] = useState(false); const [shell, setShell] = useState(false); const [earthPaused, setEarthPaused] = useState(false); const [variant] = useState(() => readVariant());
   const projection = useRef<ProjectedCity[]>([]); const lowFps = useRef(0); const d = DICT[lang];
   const onStats = useCallback((s: ReconStats) => {
     if (!document.hidden && s.quality === 'low' && s.tier === 'low' && s.frames >= 30 && s.fps < 20) {
       if (++lowFps.current >= 3) onFallback('perf');
     } else lowFps.current = 0;
   }, [onFallback]);
-  const onReady = useCallback(() => setReady(true), []);
+  const onReady = useCallback(() => setReady(true), []); const onShell = useCallback(() => setShell(true), []);
   const onLost = useCallback(() => onFallback('webgl'), [onFallback]);
   const onAssetError = useCallback(() => onFallback('assets'), [onFallback]);
   useEffect(() => { (window as unknown as { __scrollTo?: (p: number) => void }).__scrollTo = p => scene01Progress.api?.scrollTo(p, true); return () => { delete (window as unknown as { __scrollTo?: unknown }).__scrollTo; }; }, []);
@@ -90,8 +89,9 @@ function Scene01Live({ lang, enabled, onFallback }: { lang: Lang; enabled: boole
   return (
     <ScrollController lengthVh={L.total} split={L.split} split2={L.split2} split3={L.split3} touch={compact}>
       <div className="s01-poster" data-hidden={ready} aria-hidden="true" />
-      <div className="s01-canvas" data-ready={ready}>
-        {enabled && <CanvasBoundary onError={onAssetError}><ExperienceCanvas paused={earthPaused} variant={variant} progressRef={scene01Progress.ref} projection={projection} onReady={onReady} onContextLost={onLost} onAssetError={onAssetError} onStats={onStats} /></CanvasBoundary>}
+      <div className="s01-loader" data-hidden={ready || shell} aria-hidden="true"><i /></div>
+      <div className="s01-canvas" data-ready={ready} data-shell={shell}>
+        {enabled && <CanvasBoundary onError={onAssetError}><ExperienceCanvas onShell={onShell} paused={earthPaused} variant={variant} progressRef={scene01Progress.ref} projection={projection} onReady={onReady} onContextLost={onLost} onAssetError={onAssetError} onStats={onStats} /></CanvasBoundary>}
       </div>
       <div className="s01-sun" aria-hidden="true" />
       {enabled && <div ref={s2box} className="s02-canvas" aria-hidden="true">{mount2 && <Scene02Dive progressRef={u3d} activeRef={s2active} />}</div>}

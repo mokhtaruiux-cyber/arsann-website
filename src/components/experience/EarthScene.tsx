@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 import { COL, CITIES, CAMERA_JSON, GLB_SECONDS, NOTEX_GLB, NOTEX_GLB_V3, R, REGION, TEX_BASE, TIER_SETS_KTX2, TIER_SETS_WEBP, lonLatToVec3, type Tier } from '@/lib/recon/config';
-import { ATMO_FRAG, BORDER_FRAG, BORDER_VERT, CLOUD_BAKE_FRAG, CLOUD_BAKE_VERT, CLOUD_FRAG, EARTH_FRAG, NIGHT_FRAG, OCEAN_FRAG, VERT } from '@/lib/recon/shaders';
+import { ATMO_FRAG, BORDER_FRAG, BORDER_VERT, CLOUD_BAKE_FRAG, CLOUD_BAKE_VERT, CLOUD_FRAG, EARTH_FRAG, NIGHT_FRAG, OCEAN_FRAG, SHELL_FRAG, VERT } from '@/lib/recon/shaders';
 import { drive, fitCamera, playAll } from '@/lib/glbOps';
 import { createV3Effects, type V3Fx } from './v3Effects';
 import type { Variant } from '@/lib/recon/variant';
@@ -16,7 +16,7 @@ declare global { interface Window { __recon?: { stats: () => ReconStats | null; 
 /** One projected city marker in canvas CSS pixels (written every frame by the Earth; consumed by the HTML label layer). */
 export type ProjectedCity = { id: string; x: number; y: number; facing: number; inFront: boolean };
 export type ReconProps = {
-  stage?: number; tier?: string | null; format?: string | null; progress?: number | null; progressRef?: React.RefObject<number>; still?: boolean; progressive?: boolean; exposure?: number; /** stop rendering (Scene 02 fully covers the Earth canvas) */ paused?: boolean;
+  stage?: number; tier?: string | null; format?: string | null; progress?: number | null; progressRef?: React.RefObject<number>; still?: boolean; progressive?: boolean; exposure?: number; /** the planet shell is on screen (before any texture is ready) */ onShell?: () => void; /** stop rendering (Scene 02 fully covers the Earth canvas) */ paused?: boolean;
   registry?: React.RefObject<Map<string, HTMLElement>>; /** New: raw projection output for the HTML label layer. */ projection?: React.RefObject<ProjectedCity[]>; onContextLost?: () => void; onAssetError?: () => void; onReady?: () => void; onStatus?: (s: string) => void; onStats?: (s: ReconStats) => void; sunI?: number; /** Look variant: v3 (default) or legacy fallback. */ variant?: Variant;
 };
 const ss = (a: number, b: number, x: number) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
@@ -69,7 +69,7 @@ export function EarthScene(p: ReconProps & { tier: Tier; qualityRef: React.RefOb
   const variant: Variant = p.variant ?? 'v3'; const glbUrl = variant === 'legacy' ? NOTEX_GLB : NOTEX_GLB_V3; const gltf = useGLTF(glbUrl); const { actions, mixer, names } = useAnimations(gltf.animations, gltf.scene);
   const gl = useThree(s => s.gl); const scene = useThree(s => s.scene); const set = useThree(s => s.set); const size = useThree(s => s.size); const camState = useThree(s => s.camera);
   const [assets, setAssets] = useState<Assets | null>(null); const mats = useRef<Record<string, THREE.ShaderMaterial>>({}); const shift = useRef<number[] | null>(null);
-  const objs = useRef<{ clouds?: THREE.Mesh; border?: THREE.Mesh; outline?: THREE.Mesh; markers?: THREE.Points; sunDir: THREE.Vector3; cam?: THREE.PerspectiveCamera; markerPos: THREE.Vector3[]; fx?: V3Fx }>({ sunDir: new THREE.Vector3(0, 0, 1), markerPos: [] });
+  const objs = useRef<{ clouds?: THREE.Mesh; border?: THREE.Mesh; outline?: THREE.Mesh; markers?: THREE.Points; sunDir: THREE.Vector3; cam?: THREE.PerspectiveCamera; markerPos: THREE.Vector3[]; fx?: V3Fx; shell?: THREE.ShaderMaterial; fadeT0?: number }>({ sunDir: new THREE.Vector3(0, 0, 1), markerPos: [] });
   const stageRef = useRef(6); const stageProp = p.stage ?? 6; useEffect(() => { setRef(stageRef, stageProp); }, [stageProp]); const timings = useRef<Record<string, number>>({});
   const origCam = useRef<THREE.Camera | null>(null);
   const { onAssetError, onReady, format, progressive, qualityRef, tier } = p;
@@ -135,7 +135,7 @@ export function EarthScene(p: ReconProps & { tier: Tier; qualityRef: React.RefOb
     const common = { uSunDir: { value: o.sunDir }, uSunI: { value: p.sunI ?? 1.0 } };
     if (!mats.current.earth) {
       const rb = [REGION.lon0, REGION.lon1, REGION.lat0, REGION.lat1].map(THREE.MathUtils.degToRad);
-      mats.current.earth = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: EARTH_FRAG, uniforms: { ...common, uDay: { value: assets.day }, uRegion: { value: assets.region ?? assets.day }, uStage: { value: 6 }, uRegionMix: { value: 0 }, uRegionBox: { value: new THREE.Vector4(...rb) } } });
+      mats.current.earth = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: EARTH_FRAG, uniforms: { ...common, uFade: { value: 0 }, uDay: { value: assets.day }, uRegion: { value: assets.region ?? assets.day }, uStage: { value: 6 }, uRegionMix: { value: 0 }, uRegionBox: { value: new THREE.Vector4(...rb) } } });
       mats.current.night = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: NIGHT_FRAG, transparent: true, depthWrite: false, uniforms: { ...common, uNight: { value: assets.night }, uTint: { value: COL.gold.clone() }, uStrength: { value: 2.2 } } });
       mats.current.ocean = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: OCEAN_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { ...common, uMask: { value: assets.mask }, uRough: { value: 0.12 }, uStrength: { value: 0.6 } } });
       mats.current.cloud = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: CLOUD_FRAG, transparent: true, depthWrite: false, uniforms: { ...common, uCloud: { value: assets.cloud.texture }, uColor: { value: COL.pearl.clone() }, uOpacity: { value: 0.92 } } });
@@ -200,7 +200,21 @@ export function EarthScene(p: ReconProps & { tier: Tier; qualityRef: React.RefOb
   useEffect(() => () => { assets?.cloud.dispose(); }, [assets]);
 
   useFrame((state, dt) => {
-    const o = objs.current; const m = mats.current; if (!m.earth) return; const st = stageRef.current; const prog = Math.min(1, Math.max(0, (p.progressRef ? p.progressRef.current : p.progress) ?? 0));
+    const o = objs.current; const m = mats.current;
+    if (!m.earth) { // SHELL: GLB camera + a dark sun-lit sphere at exactly the final size, so the first live frame already shows the planet while the textures are still downloading
+      const g = gltf.scene; const earth = g.getObjectByName('EARTH_SURFACE') as THREE.Mesh | undefined; if (!earth) return; if (!shift.current) return;   // wait for the camera-path lens shift (6 KB): the shell must sit exactly where the finished globe will
+      if (!o.shell) {
+        const sun = g.getObjectByName('SUN'); if (sun) { sun.updateWorldMatrix(true, false); o.sunDir.set(0, 0, 1).applyQuaternion(sun.getWorldQuaternion(new THREE.Quaternion())).normalize(); sun.traverse(x => { const l = x as THREE.DirectionalLight; if (l.isLight) l.intensity = 0; }); }
+        o.shell = new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: SHELL_FRAG, uniforms: { uSunDir: { value: o.sunDir } } });
+        earth.material = o.shell; earth.renderOrder = 0; earth.frustumCulled = false; earth.visible = true;
+        for (const n of ['OCEANS', 'NIGHT_LIGHTS', 'CLOUDS', 'ATMOSPHERE', 'SAUDI_BORDER']) { const x = g.getObjectByName(n); if (x) x.visible = false; }
+        p.onShell?.();
+      }
+      const prog0 = Math.min(1, Math.max(0, (p.progressRef ? p.progressRef.current : p.progress) ?? 0)); drive(mixer, actions as never, prog0, false, GLB_SECONDS);
+      const cam0 = o.cam; if (cam0) { const z0 = size.width / size.height < 0.8 ? 1 + 1.1 * Math.min(1, Math.max(0.3, (size.height - 520) / 300)) * (1 - ss(0.1, 0.42, prog0)) : 1; const f0 = prog0 * 100, i0 = Math.min(99, Math.floor(f0)), t0 = f0 - i0; const s0 = shift.current[i0] * (1 - t0) + shift.current[i0 + 1] * t0; fitCamera(cam0, size.width, size.height, s0, z0); }
+      return;
+    }
+    if (!o.fadeT0) o.fadeT0 = performance.now(); m.earth.uniforms.uFade.value = ss(0, 900, performance.now() - o.fadeT0); const st = stageRef.current; const prog = Math.min(1, Math.max(0, (p.progressRef ? p.progressRef.current : p.progress) ?? 0));
     drive(mixer, actions as never, prog, false, GLB_SECONDS);
     const cam = o.cam; if (cam) { const f = prog * 100, i = Math.min(99, Math.floor(f)), t = f - i; const s2 = st >= 5 && shift.current ? shift.current[i] * (1 - t) + shift.current[i + 1] * t : 0; const portraitZoom = size.width / size.height < 0.8 && st >= 6 ? 1 + 1.1 * Math.min(1, Math.max(0.3, (size.height - 520) / 300)) * (1 - ss(0.1, 0.42, prog)) : 1; fitCamera(cam, size.width, size.height, s2, portraitZoom); }
     const hh = state.gl.getDrawingBufferSize(new THREE.Vector2()).y; const fov = THREE.MathUtils.degToRad(cam?.fov ?? 28.4);
