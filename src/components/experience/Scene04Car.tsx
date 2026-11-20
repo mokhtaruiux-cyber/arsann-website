@@ -29,7 +29,7 @@ export function Scene04Car() {
     const ro = new ResizeObserver(resize); ro.observe(canvas); resize();
     const load = async () => {
       if (started) return; started = true; const order = [...Array(N).keys()].sort((a, b) => ((a % 6 === 0 ? 0 : 1) - (b % 6 === 0 ? 0 : 1)) || a - b); let k = 0;
-      const worker = async () => { while (!dead && k < order.length) { const i = order[k++]; try { const r = await fetch(url(i)); if (r.ok) { blobs[i] = await r.blob(); if (Math.abs(i - cur) < 12) { ensure(); } } } catch { /* a missing frame is skipped */ } } };
+      const worker = async () => { while (!dead && k < order.length) { const i = order[k++]; for (let attempt = 0; attempt < 3 && !dead; attempt++) { try { const r = await fetch(url(i)); if (r.ok) { blobs[i] = await r.blob(); if (Math.abs(i - cur) < 12) { ensure(); } break; } } catch { /* retry */ } await new Promise(res => setTimeout(res, 400 * (attempt + 1))); }   /* GitHub Pages can answer 503 under bursts: retry, then skip the frame */ } };
       await Promise.all([worker(), worker(), worker(), worker()]); ensure(); schedule();
     };
     const onP4 = (p: number) => { cur = p * (N - 1); vis = ss(0, 0.1, p); canvas.style.opacity = String(vis); canvas.style.visibility = vis > 0 ? 'visible' : 'hidden'; if (vis > 0) { void load(); ensure(); schedule(); } };
