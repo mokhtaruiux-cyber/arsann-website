@@ -203,3 +203,5 @@ html.lenis, html.lenis body{ height:auto; }
 
 /* no dark mask over the Earth scene: the scrim gradients are removed (text sits directly on the render) */
 .s01-scrim{ display:none !important; }
+
+.s01-labels{ opacity:var(--labels-o,1); }

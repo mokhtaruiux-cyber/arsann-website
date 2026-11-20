@@ -100,10 +100,11 @@ export function Scene02Dive({ progressRef, activeRef, onReady }: { progressRef: 
       cg.scene.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.frustumCulled = false; const mt = m.material as THREE.MeshStandardMaterial; if (mt && mt.isMeshStandardMaterial) { mt.envMapIntensity = 0; mt.roughness = Math.max(mt.roughness, 0.35); if (/Rope/.test(o.name)) mt.color.set(0x5a4030); if (/Object_121/.test(o.name)) { mt.map = null; mt.color.set(0x1b130f); mt.roughness = 0.42; mt.needsUpdate = true; } if (/Object_119/.test(o.name)) { mt.map = null; mt.color.set(0x0a0706); mt.needsUpdate = true; } } } });
       chars.add(cg.scene);
       // Warm-up while the canvas is still invisible: compile every shader (async, non-blocking), then draw one frame with everything visible so geometry + textures are uploaded before the first scroll into the dive.
-      const warm = async () => { try {
+      const idle = () => new Promise<void>(res => { const w = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void }; if (w.requestIdleCallback) w.requestIdleCallback(() => res(), { timeout: 1500 }); else setTimeout(res, 60); });
+      const warm = async () => { try { await idle();
         const rv = road.visible, cv = chars.visible, clv = cloud.visible; road.visible = chars.visible = cloud.visible = true;
-        await renderer.compileAsync(scene, cam); for (const t of [sandU.uCol.value, sandU.uNrm.value, sandU.uRgh.value]) renderer.initTexture(t);
-        await new Promise<void>(r => requestAnimationFrame(() => r())); renderer.render(scene, cam);
+        await renderer.compileAsync(scene, cam); await idle(); for (const t of [sandU.uCol.value, sandU.uNrm.value, sandU.uRgh.value]) renderer.initTexture(t);
+        await idle(); renderer.render(scene, cam);
         road.visible = rv; chars.visible = cv; cloud.visible = clv;
       } catch { /* warm-up is an optimisation only */ } ready = true; onReady?.(); };
       void warm();

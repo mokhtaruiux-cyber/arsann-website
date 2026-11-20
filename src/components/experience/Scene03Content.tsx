@@ -28,9 +28,11 @@ export function Scene03Content({ lang }: { lang: Lang }) {
     };
     apply(scene03Progress.ref.current); return scene03Progress.subscribe(apply);
   }, []);
-  useEffect(() => { // decode the photos off-screen so the first cross-fade never stalls on JPEG decoding
-    const imgs = SCENE3_SHOTS.filter(x => x.img).map(x => { const i = new Image(); i.decoding = 'async'; i.src = asset(x.img as string); return i; });
-    imgs.forEach(i => { void i.decode?.().catch(() => undefined); });
+  useEffect(() => { // decode the photos one at a time in idle time (after the Earth + dive have settled), so the first cross-fade never stalls on JPEG decoding
+    let dead = false; const w = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void };
+    const idle = () => new Promise<void>(res => { if (w.requestIdleCallback) w.requestIdleCallback(() => res(), { timeout: 2000 }); else setTimeout(res, 80); });
+    const run = async () => { await new Promise(res => setTimeout(res, 6000)); for (const x of SCENE3_SHOTS) { if (dead || !x.img) continue; await idle(); const i = new Image(); i.decoding = 'async'; i.src = asset(x.img as string); try { await i.decode(); } catch { /* ignore */ } } };
+    void run(); return () => { dead = true; };
   }, []);
   return (
     <div ref={root} className="s03-root" dir={d.dir} lang={lang} style={{ visibility: 'hidden' }}>

@@ -76,11 +76,13 @@ function Scene01Live({ lang, enabled, onFallback }: { lang: Lang; enabled: boole
     const off1 = scene01Progress.subscribe(p => { if (p > 0.55) { const idle = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void }).requestIdleCallback; if (idle) idle(() => setMount2(true), { timeout: 800 }); else setTimeout(() => setMount2(true), 0); } });
     const root = document.documentElement; root.dataset.sky = 'space';
     const offPause = scene02Progress.subscribe(p => setEarthPaused(prev => { const next = p > 0.06; return prev === next ? prev : next; }));
-    const updSky = () => { const next = scene01Progress.ref.current > 0.93 || scene02Progress.ref.current > 0.02 ? 'day' : 'space'; if (root.dataset.sky !== next) root.dataset.sky = next; };   // header flips to daylight tokens as the clouds fill the frame
+    const updSky = () => { const next = scene01Progress.ref.current > 0.9 || scene02Progress.ref.current > 0.02 ? 'day' : 'space'; if (root.dataset.sky !== next) root.dataset.sky = next; };   // header flips to daylight tokens as the clouds fill the frame
+    const labFade = (p: number) => { const t = Math.min(1, Math.max(0, (p - 0.86) / 0.09)); root.style.setProperty('--labels-o', String(1 - t * t * (3 - 2 * t))); };   // city labels fade out as the clouds cover the globe
+    const offLab = scene01Progress.subscribe(labFade);
     const offSky1 = scene01Progress.subscribe(updSky), offSky2 = scene02Progress.subscribe(updSky); const offSky = () => { offSky1(); offSky2(); };
     const off2 = scene02Progress.subscribe(p => { const el = s2box.current; if (!el) return; s2active.current = p > 0 && scene03Progress.ref.current < 0.5; u3d.current = scene03Progress.ref.current > 0 ? 2 / 3 + Math.min(1, scene03Progress.ref.current / SCENE3_3D_SHARE) / 3 : p * 2 / 3; el.style.opacity = String(ss_(0, 0.05, p)); el.style.visibility = p > 0 ? 'visible' : 'hidden'; const st = el.parentElement; st?.setAttribute('data-s2', String(p > 0)); st?.style.setProperty('--s2-scrim', String(1 - ss_(0.02, 0.40, p))); st?.style.setProperty('--s2-text', String(1 - ss_(0, 0.06, p))); });
     const off3 = scene03Progress.subscribe(p3 => { if (p3 <= 0) return; s2active.current = p3 < 0.5; u3d.current = 2 / 3 + Math.min(1, p3 / SCENE3_3D_SHARE) / 3; });   // p3 = 0 means we are still in Scene 02, whose own subscriber drives the timeline
-    return () => { off1(); off2(); off3(); offSky(); offPause(); delete root.dataset.sky; };
+    return () => { off1(); off2(); off3(); offSky(); offLab(); root.style.removeProperty('--labels-o'); offPause(); delete root.dataset.sky; };
   }, [enabled]);
   return (
     <ScrollController lengthVh={SCROLL_VH} split={SPLIT} split2={SPLIT2}>
