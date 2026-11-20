@@ -25,3 +25,11 @@ export const scene03Progress = {
   publish(p: number) { this.ref.current = p; this.listeners.forEach(l => l(p)); },
   subscribe(l: Listener) { this.listeners.add(l); return () => { this.listeners.delete(l); }; },
 };
+
+/** Scene 04 progress (0..1): the Tesla corridor drive (Blender image sequence), after the horse story. */
+export const scene04Progress = {
+  ref: { current: 0 },
+  listeners: new Set<Listener>(),
+  publish(p: number) { this.ref.current = p; this.listeners.forEach(l => l(p)); },
+  subscribe(l: Listener) { this.listeners.add(l); return () => { this.listeners.delete(l); }; },
+};

@@ -9,9 +9,10 @@ import { SiteHeader } from './SiteHeader';
 import { PerformanceFallback, type FallbackReason } from './PerformanceFallback';
 import type { ProjectedCity, ReconStats } from './EarthScene';
 import { DICT, type Lang } from '@/content/scene01';
-import { scene01Progress, scene02Progress, scene03Progress } from '@/lib/scene01/progress';
+import { scene01Progress, scene02Progress, scene03Progress, scene04Progress } from '@/lib/scene01/progress';
 import { SCENE3_3D_SHARE } from '@/content/scene03';
 import { Scene03Content } from './Scene03Content';
+import { Scene02Content } from './Scene02Content';
 import { Scene02Dive } from './Scene02Dive';
 import { readVariant } from '@/lib/recon/variant';
 
@@ -28,7 +29,7 @@ function hasWebGL() {
   return webglOk;
 }
 /** Scroll length per scene in vh. Phones get ~55 % of the desktop length: a normal swipe then moves the story a clear step instead of needing very long drags. */
-const lengths = (compact: boolean) => { const k = compact ? 0.55 : 1, a = 700 * k, b = 380 * k, c = 450 * k, t = a + b + c; return { total: t, split: a / t, split2: (a + b) / t }; };
+const lengths = (compact: boolean) => { const k = compact ? 0.55 : 1, a = 700 * k, b = 380 * k, c = 450 * k, d = 700 * k, t = a + b + c + d; return { total: t, split: a / t, split2: (a + b) / t, split3: (a + b + c) / t }; };
 const isCompact = () => window.matchMedia('(max-width: 820px), (pointer: coarse)').matches;
 type Mode = 'pending' | 'live' | FallbackReason;
 const subscribeMotion = (cb: () => void) => { const m = window.matchMedia('(prefers-reduced-motion: reduce)'); m.addEventListener('change', cb); return () => m.removeEventListener('change', cb); };
@@ -78,22 +79,23 @@ function Scene01Live({ lang, enabled, onFallback }: { lang: Lang; enabled: boole
     const off1 = scene01Progress.subscribe(p => { if (p > 0.55) { const idle = (window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void }).requestIdleCallback; if (idle) idle(() => setMount2(true), { timeout: 800 }); else setTimeout(() => setMount2(true), 0); } });
     const root = document.documentElement; root.dataset.sky = 'space';
     const offPause = scene02Progress.subscribe(p => setEarthPaused(prev => { const next = p > 0.06; return prev === next ? prev : next; }));
-    const updSky = () => { const next = scene01Progress.ref.current > 0.9 || scene02Progress.ref.current > 0.02 ? 'day' : 'space'; if (root.dataset.sky !== next) root.dataset.sky = next; };   // header flips to daylight tokens as the clouds fill the frame
+    const updSky = () => { const next = scene04Progress.ref.current > 0.66 ? 'space' : scene01Progress.ref.current > 0.9 || scene02Progress.ref.current > 0.02 ? 'day' : 'space'; /* the last third of the car drive is the dark Smart Parking garage: light text again */ if (root.dataset.sky !== next) root.dataset.sky = next; };   // header flips to daylight tokens as the clouds fill the frame
     const labFade = (p: number) => { const t = Math.min(1, Math.max(0, (p - 0.86) / 0.09)); root.style.setProperty('--labels-o', String(1 - t * t * (3 - 2 * t))); };   // city labels fade out as the clouds cover the globe
     const offLab = scene01Progress.subscribe(labFade);
-    const offSky1 = scene01Progress.subscribe(updSky), offSky2 = scene02Progress.subscribe(updSky); const offSky = () => { offSky1(); offSky2(); };
+    const offSky1 = scene01Progress.subscribe(updSky), offSky2 = scene02Progress.subscribe(updSky), offSky3 = scene04Progress.subscribe(updSky); const offSky = () => { offSky1(); offSky2(); offSky3(); };
     const off2 = scene02Progress.subscribe(p => { const el = s2box.current; if (!el) return; s2active.current = p > 0 && scene03Progress.ref.current < 0.5; u3d.current = scene03Progress.ref.current > 0 ? 2 / 3 + Math.min(1, scene03Progress.ref.current / SCENE3_3D_SHARE) / 3 : p * 2 / 3; el.style.opacity = String(ss_(0, 0.05, p)); el.style.visibility = p > 0 ? 'visible' : 'hidden'; const st = el.parentElement; st?.setAttribute('data-s2', String(p > 0)); st?.style.setProperty('--s2-scrim', String(1 - ss_(0.02, 0.40, p))); st?.style.setProperty('--s2-text', String(1 - ss_(0, 0.06, p))); });
     const off3 = scene03Progress.subscribe(p3 => { if (p3 <= 0) return; s2active.current = p3 < 0.5; u3d.current = 2 / 3 + Math.min(1, p3 / SCENE3_3D_SHARE) / 3; });   // p3 = 0 means we are still in Scene 02, whose own subscriber drives the timeline
     return () => { off1(); off2(); off3(); offSky(); offLab(); root.style.removeProperty('--labels-o'); offPause(); delete root.dataset.sky; };
   }, [enabled]);
   return (
-    <ScrollController lengthVh={L.total} split={L.split} split2={L.split2} touch={compact}>
+    <ScrollController lengthVh={L.total} split={L.split} split2={L.split2} split3={L.split3} touch={compact}>
       <div className="s01-poster" data-hidden={ready} aria-hidden="true" />
       <div className="s01-canvas" data-ready={ready}>
         {enabled && <CanvasBoundary onError={onAssetError}><ExperienceCanvas paused={earthPaused} variant={variant} progressRef={scene01Progress.ref} projection={projection} onReady={onReady} onContextLost={onLost} onAssetError={onAssetError} onStats={onStats} /></CanvasBoundary>}
       </div>
       <div className="s01-sun" aria-hidden="true" />
       {enabled && <div ref={s2box} className="s02-canvas" aria-hidden="true">{mount2 && <Scene02Dive progressRef={u3d} activeRef={s2active} />}</div>}
+      {enabled && <Scene02Content lang={lang} />}
       {enabled && <Scene03Content lang={lang} />}
       <SceneLabels projection={projection} lang={lang} variant={variant} />
       <Scene01Content lang={lang} />

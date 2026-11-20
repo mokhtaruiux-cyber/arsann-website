@@ -205,3 +205,8 @@ html.lenis, html.lenis body{ height:auto; }
 .s01-scrim{ display:none !important; }
 
 .s01-labels{ opacity:var(--labels-o,1); }
+
+/* Scene 04 (Tesla drive, Blender image sequence) and the Landing copy over the dive */
+.s04-car{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.s02-copy{ position:absolute; inset:0; z-index:10; pointer-events:none; }
+.s03-block .s01-body{ will-change:transform,opacity; }
