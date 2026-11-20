@@ -1,0 +1,2 @@
+export type PerfStats = { fps: number; avgMs: number; p95Ms: number; maxMs: number; spikes33: number; frames: number; calls: number; triangles: number; geometries: number; textures: number; maxTex: number; gpu: string; camera: string };
+declare global { interface Window { __s01?: { stats: () => PerfStats | null; setProgress: (p: number | null) => void; setGlbCamera: (b: boolean) => void; ready: boolean; disposeLog: unknown[] } } }

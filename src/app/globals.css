@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Official ARSANN Brand Guidelines V1.0 (2026) tokens — see ARSANN_OFFICIAL_DESIGN_TOKENS.md */
+:root {
+  --arsann-charcoal: #1E1E14; --arsann-slate: #5A5A50; --arsann-stone: #D7D7C8; --arsann-pearl: #FAFAF5;
+  --arsann-burgundy: #281414; --arsann-copper: #64412D; --arsann-rosewood: #D2BEBE; --arsann-light-gold: #C8B9A5;
+  --arsann-charcoal-s25: #16160F; --arsann-stone-s25: #A1A196; --arsann-slate-s25: #44443C; --arsann-slate-s50: #2D2D28;
+  --background: #1E1E14; --foreground: #D7D7C8; --scrim: 30,30,20; --edge: 215,215,200;
+}
+@theme inline { --color-background: var(--background); --color-foreground: var(--foreground); }
+body { background: var(--background); color: var(--foreground); }
+
+/* Space (Figma: charcoal canvas) is the default for the Earth scene; once the camera dives into the desert the page flips to daylight tokens. */
+html[data-sky="day"]{ --arsann-charcoal: #DCEAF4; --arsann-stone: #1E1E14; --arsann-pearl: #2A2A20; --arsann-light-gold: #B8902F; --background: #DCEAF4; --foreground: #1E1E14; --scrim: 220,234,244; --edge: 30,30,20; }
