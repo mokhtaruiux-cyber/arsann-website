@@ -27,7 +27,9 @@ function hasWebGL() {
   }
   return webglOk;
 }
-const SCENE1_VH = 700, SCENE2_VH = 380, SCENE3_VH = 450, SCROLL_VH = SCENE1_VH + SCENE2_VH + SCENE3_VH, SPLIT = SCENE1_VH / SCROLL_VH, SPLIT2 = (SCENE1_VH + SCENE2_VH) / SCROLL_VH;
+/** Scroll length per scene in vh. Phones get ~55 % of the desktop length: a normal swipe then moves the story a clear step instead of needing very long drags. */
+const lengths = (compact: boolean) => { const k = compact ? 0.55 : 1, a = 700 * k, b = 380 * k, c = 450 * k, t = a + b + c; return { total: t, split: a / t, split2: (a + b) / t }; };
+const isCompact = () => window.matchMedia('(max-width: 820px), (pointer: coarse)').matches;
 type Mode = 'pending' | 'live' | FallbackReason;
 const subscribeMotion = (cb: () => void) => { const m = window.matchMedia('(prefers-reduced-motion: reduce)'); m.addEventListener('change', cb); return () => m.removeEventListener('change', cb); };
 function envSnapshot(): Mode {
@@ -55,7 +57,7 @@ export function Scene01Experience({ lang }: { lang: Lang }) {
 }
 
 function Scene01Live({ lang, enabled, onFallback }: { lang: Lang; enabled: boolean; onFallback: (reason: FallbackReason) => void }) {
-  const [ready, setReady] = useState(false); const [earthPaused, setEarthPaused] = useState(false); const [variant] = useState(() => readVariant());
+  const [compact, setCompact] = useState(false); useEffect(() => { setCompact(isCompact()); }, []); const L = lengths(compact); const [ready, setReady] = useState(false); const [earthPaused, setEarthPaused] = useState(false); const [variant] = useState(() => readVariant());
   const projection = useRef<ProjectedCity[]>([]); const lowFps = useRef(0); const d = DICT[lang];
   const onStats = useCallback((s: ReconStats) => {
     if (!document.hidden && s.quality === 'low' && s.tier === 'low' && s.frames >= 30 && s.fps < 20) {
@@ -85,7 +87,7 @@ function Scene01Live({ lang, enabled, onFallback }: { lang: Lang; enabled: boole
     return () => { off1(); off2(); off3(); offSky(); offLab(); root.style.removeProperty('--labels-o'); offPause(); delete root.dataset.sky; };
   }, [enabled]);
   return (
-    <ScrollController lengthVh={SCROLL_VH} split={SPLIT} split2={SPLIT2}>
+    <ScrollController lengthVh={L.total} split={L.split} split2={L.split2} touch={compact}>
       <div className="s01-poster" data-hidden={ready} aria-hidden="true" />
       <div className="s01-canvas" data-ready={ready}>
         {enabled && <CanvasBoundary onError={onAssetError}><ExperienceCanvas paused={earthPaused} variant={variant} progressRef={scene01Progress.ref} projection={projection} onReady={onReady} onContextLost={onLost} onAssetError={onAssetError} onStats={onStats} /></CanvasBoundary>}

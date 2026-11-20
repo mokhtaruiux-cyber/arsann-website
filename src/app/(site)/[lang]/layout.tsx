@@ -5,6 +5,8 @@ import { asset } from '@/lib/asset';
 import '../../globals.css';
 import './site.css';
 
+/** The live Earth camera zooms in on narrow/short phones (EarthScene portraitZoom); the baked poster is a 390×844 capture, so it is scaled with the same formula before first paint — no size jump when the live canvas takes over. */
+const POSTER_ZOOM_JS = `(function(){function z(){var w=innerWidth,h=innerHeight,v=1;if(w/h<0.8){var t=Math.min(1,Math.max(0.3,(h-520)/300));v=(1+1.1*t)/2.1}document.documentElement.style.setProperty('--pz',v.toFixed(4))}z();addEventListener('resize',z)})()`;
 export function generateStaticParams() { return LANGS.map(lang => ({ lang })); }
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params; if (!isLang(lang)) return {}; const d = DICT[lang];
@@ -14,7 +16,7 @@ export default async function SiteLayout({ children, params }: { children: React
   const { lang } = await params; if (!isLang(lang)) notFound();
   return (
     <html lang={lang} dir={DICT[lang].dir} data-site="arsann" suppressHydrationWarning>
-      <head>{(lang === 'ar' ? ['ZaridSansAL-Regular.ttf', 'ZaridSansAL-Medium.ttf'] : ['GeneralSans-Regular.otf', 'GeneralSans-Medium.otf']).map(f => <link key={f} rel="preload" href={asset(`/fonts/${f}`)} as="font" type={f.endsWith('.ttf') ? 'font/ttf' : 'font/otf'} crossOrigin="anonymous" />)}</head>
+      <head><script dangerouslySetInnerHTML={{ __html: POSTER_ZOOM_JS }} />{(lang === 'ar' ? ['ZaridSansAL-Regular.ttf', 'ZaridSansAL-Medium.ttf'] : ['GeneralSans-Regular.otf', 'GeneralSans-Medium.otf']).map(f => <link key={f} rel="preload" href={asset(`/fonts/${f}`)} as="font" type={f.endsWith('.ttf') ? 'font/ttf' : 'font/otf'} crossOrigin="anonymous" />)}</head>
       <body suppressHydrationWarning>{children}</body>
     </html>
   );

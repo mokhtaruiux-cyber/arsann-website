@@ -41,7 +41,7 @@ a{ color:inherit; }
 /* The live camera keeps the 16:9 horizontal FOV on narrower screens (image spans the full width) and the 16:9 vertical FOV on wider ones (image spans the full height), so the poster does the same: no size jump when the live Earth fades in. */
 @media (min-aspect-ratio: 16/9){ .s01-poster{ background-size:auto 100%; background-position:100% 50%; } }
 /* Phones (narrower than 4:5): the live camera zooms in, so the poster is a capture of that live first frame and simply covers the screen */
-@media (max-aspect-ratio: 4/5){ .s01-poster{ background-image:url(/posters/s01_000_portrait.webp); background-size:cover; background-position:50% 50%; } }
+@media (max-aspect-ratio: 4/5){ .s01-poster{ background-image:url(/posters/s01_000_portrait.webp); background-size:calc(100% * var(--pz, 1)) auto; background-position:50% 50%; } }
 .s01-poster[data-hidden="true"]{ opacity:0; }
 .s01-canvas{ position:absolute; inset:0; opacity:0; transition:opacity .9s ease; }
 .s01-canvas[data-ready="true"]{ opacity:1; }
