@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 export const R = 6.371;
 export const NOTEX_GLB = '/models/scene01/scene01_origin.notex.glb';
+/** v3 (PM edits 17 Nov 2026): camera ends on Madinah, no Saudi border. Legacy look keeps NOTEX_GLB + camera_path.json. */
+export const NOTEX_GLB_V3 = '/models/scene01/v3/scene01_origin.notex.glb';
+export const CAMERA_JSON = { v3: '/data/camera_path_v3.json', legacy: '/data/camera_path.json' } as const;
 export const GLB_SECONDS = 10; // exported clips: progress 0..1 == 10 s
 export const TEX_BASE = '/textures/scene01/';
 export type Tier = 'low' | 'medium' | 'high';

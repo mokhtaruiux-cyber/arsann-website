@@ -4,12 +4,19 @@ export const VERT = /* glsl */ `
 varying vec2 vUv; varying vec3 vNormalW; varying vec3 vPosL; varying vec3 vWorld;
 void main(){ vUv = uv; vPosL = position; vNormalW = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position, 1.0); vWorld = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
 
+/** Placeholder look of the planet before any texture has arrived: a dark sphere lit from the sun side with a soft blue limb. Also the colour the textured Earth fades in from (uFade), so nothing pops. */
+export const SHELL_GLSL = /* glsl */ `
+vec3 shellColor(vec3 n, vec3 v, float ndl){ vec3 c = vec3(0.010, 0.014, 0.024) + vec3(0.060, 0.090, 0.150) * smoothstep(-0.05, 0.65, ndl);
+  float rim = pow(1.0 - max(dot(n, v), 0.0), 3.0); return c + vec3(0.30, 0.45, 0.75) * rim * smoothstep(-0.25, 0.55, ndl) * 0.55; }`;
+
 const TAIL = /* glsl */ `
   #include <tonemapping_fragment>
   #include <colorspace_fragment>`;
 
 /** Earth surface: day texture (+ regional tile), brand-graded, lit by the sun direction, with the Blender "sky fill / Rayleigh haze / twilight" terms. */
 export const EARTH_FRAG = /* glsl */ `
+${SHELL_GLSL}
+uniform float uFade;
 uniform sampler2D uDay; uniform sampler2D uRegion; uniform vec3 uSunDir; uniform float uSunI; uniform float uStage; uniform float uRegionMix;
 uniform vec4 uRegionBox; // lon0 lon1 lat0 lat1 (radians)
 varying vec2 vUv; varying vec3 vNormalW; varying vec3 vPosL; varying vec3 vWorld;
@@ -33,7 +40,10 @@ void main(){
     vec3 twc = mix(vec3(0.30, 0.38, 0.62), vec3(0.672, 0.323, 0.150), ss(-0.12, 0.10, ndl));
     col += g * twc * (tw * 0.06 + ss(-0.10, 0.50, ndl) * 0.22);         // sky fill + twilight
     col += vec3(0.030, 0.044, 0.060) * ss(-0.05, 0.55, ndl);           // Rayleigh haze (day side, desaturated)
+    col += g * vec3(0.10, 0.11, 0.14) * (1.0 - 0.5 * ss(0.0, 0.5, ndl)); // daylight: soft fill so the shadow side reads on the light sky
+    col += vec3(1.0, 0.80, 0.50) * pow(max(ndl, 0.0), 6.0) * 0.06; // warm sun bloom on the lit side
   }
+  col = mix(shellColor(n, normalize(cameraPosition - vWorld), ndl), col, uFade);
   gl_FragColor = vec4(col, 1.0);${TAIL}
 }`;
 
@@ -112,4 +122,10 @@ export const BORDER_FRAG = /* glsl */ `
 uniform vec3 uColor; uniform float uReveal; uniform float uAlpha; varying float vAng;
 void main(){ float t = (vAng + 3.14159265) / 6.2831853; float a = (1.0 - smoothstep(uReveal - 0.02, uReveal + 0.005, t)) * uAlpha; if (a < 0.003) discard;
   gl_FragColor = vec4(uColor, a);${TAIL}
+}`;
+
+export const SHELL_FRAG = /* glsl */ `
+${SHELL_GLSL}
+uniform vec3 uSunDir; varying vec3 vNormalW; varying vec3 vWorld;
+void main(){ vec3 n = normalize(vNormalW); vec3 v = normalize(cameraPosition - vWorld); gl_FragColor = vec4(shellColor(n, v, dot(n, uSunDir)), 1.0);${TAIL}
 }`;
