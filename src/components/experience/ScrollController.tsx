@@ -7,7 +7,7 @@ import { scene01Progress, scene02Progress, scene03Progress, scene04Progress } fr
 
 /** Owns smooth scrolling (Lenis), the pinned ScrollTrigger and the progress publication. One scroll owner: Lenis is driven by gsap.ticker and feeds ScrollTrigger.
  *  Everything is created inside a gsap.context and torn down on unmount (route change / language switch / fallback). */
-export function ScrollController({ lengthVh, split = 1, split2 = 1, split3 = 1, touch = false, children, onTimelineProgress }: { lengthVh: number; /** end of Scene 02's share (Scene 03 takes the rest) */ split2?: number; /** end of Scene 03's share (Scene 04 takes the rest) */ split3?: number; /** phone / touch: snappier damping */ touch?: boolean; /** share of the scroll length that belongs to Scene 01 (the rest drives Scene 02) */ split?: number; children: ReactNode; onTimelineProgress?: (p: number) => void }) {
+export function ScrollController({ lengthVh, split = 1, split2 = 1, split3 = 1, touch = false, locked = false, children, onTimelineProgress }: { lengthVh: number; /** end of Scene 02's share (Scene 03 takes the rest) */ split2?: number; /** end of Scene 03's share (Scene 04 takes the rest) */ split3?: number; /** phone / touch: snappier damping */ touch?: boolean; /** share of the scroll length that belongs to Scene 01 (the rest drives Scene 02) */ split?: number; locked?: boolean; children: ReactNode; onTimelineProgress?: (p: number) => void }) {
   const stage = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const el = stage.current; if (!el) return; gsap.registerPlugin(ScrollTrigger);
@@ -35,5 +35,5 @@ export function ScrollController({ lengthVh, split = 1, split2 = 1, split3 = 1, 
     } catch { /* Continue when storage is unavailable. */ }
     return () => { timers.forEach(clearTimeout); ctx.revert(); gsap.ticker.remove(tick); gsap.ticker.remove(damp); lenis.destroy(); history.scrollRestoration = prevRestoration; scene01Progress.api = null; };
   }, [lengthVh, split, split2, split3, touch, onTimelineProgress]);
-  return <div className="s01-root"><div ref={stage} className="s01-stage">{children}</div></div>;
+  return <div className="s01-root" inert={locked}><div ref={stage} className="s01-stage">{children}</div></div>;
 }

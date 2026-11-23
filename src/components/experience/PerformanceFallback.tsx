@@ -1,7 +1,7 @@
+import { asset } from '@/lib/asset';
 import Image from 'next/image';
 import { DICT, type Lang } from '@/content/scene01';
 import { SiteHeader } from './SiteHeader';
-import { asset } from '@/lib/asset';
 
 export type FallbackReason = 'reduced' | 'webgl' | 'perf' | 'assets';
 /** An ordinary scrolling page over pre-rendered stills. Same copy, header and language switch. */

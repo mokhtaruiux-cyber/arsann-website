@@ -1,0 +1,697 @@
+{
+ "file": "public/models/scene01/scene01_origin.glb",
+ "bytes": 11632356,
+ "extensionsUsed": [
+  "KHR_lights_punctual",
+  "KHR_materials_emissive_strength",
+  "KHR_materials_specular"
+ ],
+ "scenes": 1,
+ "nodes": 30,
+ "meshes": 23,
+ "materials": 8,
+ "textures": 2,
+ "cameras": [
+  {
+   "name": "CAM_SCENE01",
+   "type": "perspective",
+   "yfov": 0.4958353284296838,
+   "znear": 0.05000000074505806,
+   "zfar": 500,
+   "aspect": 1.7777777777777777
+  }
+ ],
+ "animations": [
+  {
+   "name": "CAM_ARM",
+   "channels": 1,
+   "targets": [
+    "CAM_ARM:rotation"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "CAM_TARGET",
+   "channels": 1,
+   "targets": [
+    "CAM_TARGET:translation"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "CAM_TILT",
+   "channels": 1,
+   "targets": [
+    "CAM_TILT:rotation"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "CAM_SCENE01",
+   "channels": 2,
+   "targets": [
+    "CAM_SCENE01:translation",
+    "CAM_SCENE01:rotation"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_01_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_01_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_02_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_02_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_03_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_03_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_04_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_04_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_05_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_05_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_06_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_06_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_07_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_07_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_08_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_08_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  },
+  {
+   "name": "NODE_HUB_ILLUSTRATIVE",
+   "channels": 1,
+   "targets": [
+    "NODE_HUB_ILLUSTRATIVE:scale"
+   ],
+   "maxTime": 10,
+   "keyframes": 241
+  }
+ ],
+ "nodesTree": [
+  "CAM_ARM",
+  "  CAM_TARGET",
+  "  CAM_TILT",
+  "    CAM_SCENE01 [camera]",
+  "EARTH_GLOBE_ROOT",
+  "  ATMOSPHERE [mesh]",
+  "  CLOUDS [mesh]",
+  "  EARTH_SURFACE [mesh]",
+  "  LINK_01 [mesh]",
+  "  LINK_02 [mesh]",
+  "  LINK_03 [mesh]",
+  "  LINK_04 [mesh]",
+  "  LINK_05 [mesh]",
+  "  LINK_06 [mesh]",
+  "  LINK_07 [mesh]",
+  "  LINK_08 [mesh]",
+  "  NIGHT_LIGHTS [mesh]",
+  "  NODE_01_ILLUSTRATIVE [mesh]",
+  "  NODE_02_ILLUSTRATIVE [mesh]",
+  "  NODE_03_ILLUSTRATIVE [mesh]",
+  "  NODE_04_ILLUSTRATIVE [mesh]",
+  "  NODE_05_ILLUSTRATIVE [mesh]",
+  "  NODE_06_ILLUSTRATIVE [mesh]",
+  "  NODE_07_ILLUSTRATIVE [mesh]",
+  "  NODE_08_ILLUSTRATIVE [mesh]",
+  "  NODE_HUB_ILLUSTRATIVE [mesh]",
+  "  OCEANS [mesh]",
+  "  SAUDI_BORDER [mesh]",
+  "SCENE_CONTROLLER",
+  "SUN [light]"
+ ],
+ "meshDetail": [
+  {
+   "name": "Sphere.003",
+   "prims": 1,
+   "verts": 4751,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "ATMOSPHERE_LIMB"
+   ]
+  },
+  {
+   "name": "Sphere.002",
+   "prims": 1,
+   "verts": 4751,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "CLOUDS_PROCEDURAL"
+   ]
+  },
+  {
+   "name": "Sphere",
+   "prims": 1,
+   "verts": 8383,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "EARTH_SURFACE_NASA"
+   ]
+  },
+  {
+   "name": "LINK_01",
+   "prims": 1,
+   "verts": 26,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_LINK"
+   ]
+  },
+  {
+   "name": "LINK_02",
+   "prims": 1,
+   "verts": 26,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_LINK"
+   ]
+  },
+  {
+   "name": "LINK_03",
+   "prims": 1,
+   "verts": 26,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_LINK"
+   ]
+  },
+  {
+   "name": "LINK_04",
+   "prims": 1,
+   "verts": 26,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_LINK"
+   ]
+  },
+  {
+   "name": "LINK_05",
+   "prims": 1,
+   "verts": 26,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_LINK"
+   ]
+  },
+  {
+   "name": "LINK_06",
+   "prims": 1,
+   "verts": 26,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_LINK"
+   ]
+  },
+  {
+   "name": "LINK_07",
+   "prims": 1,
+   "verts": 26,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_LINK"
+   ]
+  },
+  {
+   "name": "LINK_08",
+   "prims": 1,
+   "verts": 26,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_LINK"
+   ]
+  },
+  {
+   "name": "Sphere.004",
+   "prims": 1,
+   "verts": 4751,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "NIGHT_LIGHTS_NASA"
+   ]
+  },
+  {
+   "name": "Sphere.006",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.007",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.008",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.009",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.010",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.011",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.012",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.013",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.005",
+   "prims": 1,
+   "verts": 480,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_NODE"
+   ]
+  },
+  {
+   "name": "Sphere.001",
+   "prims": 1,
+   "verts": 4751,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "OCEAN_SPECULAR"
+   ]
+  },
+  {
+   "name": "SAUDI_BORDER",
+   "prims": 1,
+   "verts": 9590,
+   "attrs": [
+    "POSITION",
+    "NORMAL",
+    "TEXCOORD_0"
+   ],
+   "mat": [
+    "TEAL_BORDER"
+   ]
+  }
+ ],
+ "materialDetail": [
+  {
+   "name": "ATMOSPHERE_LIMB",
+   "base": [
+    0,
+    0,
+    0,
+    1
+   ],
+   "baseTex": null,
+   "rough": 1,
+   "metal": 1,
+   "emissive": [
+    1,
+    1,
+    1
+   ],
+   "emTex": null,
+   "alphaMode": "OPAQUE",
+   "alpha": 1,
+   "doubleSided": true,
+   "exts": [
+    "KHR_materials_emissive_strength"
+   ]
+  },
+  {
+   "name": "CLOUDS_PROCEDURAL",
+   "base": [
+    0.92,
+    0.94,
+    0.97,
+    1
+   ],
+   "baseTex": null,
+   "rough": 1,
+   "metal": 0,
+   "emissive": [
+    0,
+    0,
+    0
+   ],
+   "emTex": null,
+   "alphaMode": "OPAQUE",
+   "alpha": 1,
+   "doubleSided": true,
+   "exts": [
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "name": "EARTH_SURFACE_NASA",
+   "base": [
+    1,
+    1,
+    1,
+    1
+   ],
+   "baseTex": "bmng_day_apr2004_5400x2700",
+   "rough": 0.8799999952316284,
+   "metal": 0,
+   "emissive": [
+    1,
+    1,
+    1
+   ],
+   "emTex": "bmng_day_apr2004_5400x2700",
+   "alphaMode": "OPAQUE",
+   "alpha": 1,
+   "doubleSided": true,
+   "exts": [
+    "KHR_materials_specular"
+   ]
+  },
+  {
+   "name": "TEAL_LINK",
+   "base": [
+    0,
+    0,
+    0,
+    1
+   ],
+   "baseTex": null,
+   "rough": 1,
+   "metal": 1,
+   "emissive": [
+    0.086,
+    0.617,
+    0.532
+   ],
+   "emTex": null,
+   "alphaMode": "OPAQUE",
+   "alpha": 1,
+   "doubleSided": true,
+   "exts": []
+  },
+  {
+   "name": "NIGHT_LIGHTS_NASA",
+   "base": [
+    0,
+    0,
+    0,
+    1
+   ],
+   "baseTex": null,
+   "rough": 1,
+   "metal": 1,
+   "emissive": [
+    1,
+    0.82,
+    0.6
+   ],
+   "emTex": "blackmarble_2012_3km_13500x6750",
+   "alphaMode": "OPAQUE",
+   "alpha": 1,
+   "doubleSided": true,
+   "exts": [
+    "KHR_materials_emissive_strength"
+   ]
+  },
+  {
+   "name": "TEAL_NODE",
+   "base": [
+    0,
+    0,
+    0,
+    1
+   ],
+   "baseTex": null,
+   "rough": 1,
+   "metal": 1,
+   "emissive": [
+    0.139,
+    1,
+    0.862
+   ],
+   "emTex": null,
+   "alphaMode": "OPAQUE",
+   "alpha": 1,
+   "doubleSided": true,
+   "exts": [
+    "KHR_materials_emissive_strength"
+   ]
+  },
+  {
+   "name": "OCEAN_SPECULAR",
+   "base": [
+    1,
+    1,
+    1,
+    1
+   ],
+   "baseTex": null,
+   "rough": 1,
+   "metal": 1,
+   "emissive": [
+    0,
+    0,
+    0
+   ],
+   "emTex": null,
+   "alphaMode": "OPAQUE",
+   "alpha": 1,
+   "doubleSided": true,
+   "exts": []
+  },
+  {
+   "name": "TEAL_BORDER",
+   "base": [
+    0,
+    0,
+    0,
+    1
+   ],
+   "baseTex": null,
+   "rough": 1,
+   "metal": 1,
+   "emissive": [
+    0.105,
+    0.755,
+    0.65
+   ],
+   "emTex": null,
+   "alphaMode": "OPAQUE",
+   "alpha": 1,
+   "doubleSided": true,
+   "exts": []
+  }
+ ],
+ "textureDetail": [
+  {
+   "name": "bmng_day_apr2004_5400x2700",
+   "mime": "image/jpeg",
+   "bytes": 1774173,
+   "size": [
+    5400,
+    2700
+   ]
+  },
+  {
+   "name": "blackmarble_2012_3km_13500x6750",
+   "mime": "image/jpeg",
+   "bytes": 8044288,
+   "size": [
+    13500,
+    6750
+   ]
+  }
+ ],
+ "lights": [
+  {
+   "node": "SUN",
+   "light": "directional",
+   "intensity": 2185.600032567978,
+   "color": [
+    1,
+    0.9300000071525574,
+    0.8199999928474426
+   ]
+  }
+ ]
+}

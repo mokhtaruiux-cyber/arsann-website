@@ -1,0 +1,48 @@
+{
+ "label": "cacheComponents_on",
+ "open": {
+  "canvasesInDom": 1,
+  "contextLost": false,
+  "memory": {
+   "geometries": 25,
+   "textures": 8
+  },
+  "programs": 18,
+  "frames": 159,
+  "url": "/scene01-recon"
+ },
+ "afterLeave": {
+  "canvasesInDom": 1,
+  "contextLost": false,
+  "memory": {
+   "geometries": 0,
+   "textures": 3
+  },
+  "programs": 5,
+  "frames": 159,
+  "url": "/"
+ },
+ "afterLeave2": {
+  "canvasesInDom": 1,
+  "contextLost": false,
+  "memory": {
+   "geometries": 0,
+   "textures": 3
+  },
+  "programs": 5,
+  "frames": 159,
+  "url": "/"
+ },
+ "renderLoopStopped": true,
+ "reenter": {
+  "canvasesInDom": 1,
+  "contextLost": false,
+  "memory": {
+   "geometries": 7,
+   "textures": 10
+  },
+  "programs": 18,
+  "frames": 216,
+  "url": "/scene01-recon"
+ }
+}

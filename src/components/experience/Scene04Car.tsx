@@ -1,10 +1,11 @@
 'use client';
+import { asset } from '@/lib/asset';
 import { useEffect, useRef } from 'react';
 import { scene02Progress, scene03Progress, scene04Progress } from '@/lib/scene01/progress';
 import { CAR_FRAMES as N } from '@/content/scene03';
-import { asset } from '@/lib/asset';
+
 const ss = (a: number, b: number, x: number) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-const url = (i: number) => asset(`/frames/car/f_${String(1 + 2 * i).padStart(4, '0')}.webp`);
+const url = (i: number) => (asset(`/frames/car/f_${String(1 + 2 * i).padStart(4, '0')}.webp`));
 
 /** Scene 04: the Blender drive, scrubbed by scroll. Frames are fetched as small WebP blobs (about 5 MB in all, coarse frames first) and only a short window around the current frame is decoded,
  *  so memory stays low on phones. Neighbouring frames are cross-blended only around the half-way point (short, to avoid ghosting while the camera moves fast). */
@@ -12,6 +13,8 @@ export function Scene04Car() {
   const cv = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = cv.current; if (!canvas) return; const ctx = canvas.getContext('2d'); if (!ctx) return;
+    // The rein has already vanished into the halter before Scene 04 starts. Reveal the steering shot first.
+    const handoffFade = .08;
     const blobs: (Blob | undefined)[] = new Array(N).fill(undefined); const bmps = new Map<number, ImageBitmap>(); const pending = new Set<number>();
     let cur = 0, vis = 0, started = false, dead = false, raf = 0, w = 0, h = 0;
     const draw = () => {
@@ -29,10 +32,12 @@ export function Scene04Car() {
     const ro = new ResizeObserver(resize); ro.observe(canvas); resize();
     const load = async () => {
       if (started) return; started = true; const order = [...Array(N).keys()].sort((a, b) => ((a % 6 === 0 ? 0 : 1) - (b % 6 === 0 ? 0 : 1)) || a - b); let k = 0;
-      const worker = async () => { while (!dead && k < order.length) { const i = order[k++]; for (let attempt = 0; attempt < 3 && !dead; attempt++) { try { const r = await fetch(url(i)); if (r.ok) { blobs[i] = await r.blob(); if (Math.abs(i - cur) < 12) { ensure(); } break; } } catch { /* retry */ } await new Promise(res => setTimeout(res, 400 * (attempt + 1))); }   /* GitHub Pages can answer 503 under bursts: retry, then skip the frame */ } };
-      await Promise.all([worker(), worker(), worker(), worker()]); ensure(); schedule();
+      const worker = async () => { while (!dead && k < order.length) { const i = order[k++]; for (let attempt = 0; attempt < 3 && !dead; attempt++) { try { const r = await fetch(url(i), { priority: 'low' }); if (r.ok) { blobs[i] = await r.blob(); if (Math.abs(i - cur) < 12) { ensure(); } break; } } catch { /* retry */ } await new Promise(res => setTimeout(res, 400 * (attempt + 1))); }   /* GitHub Pages can answer 503 under bursts: retry, then skip the frame */ } };
+      const c = (navigator as Navigator & { connection?: { downlink?: number; effectiveType?: string; saveData?: boolean } }).connection;
+      const slow = c?.saveData || ['slow-2g', '2g', '3g'].includes(c?.effectiveType ?? '') || (c?.downlink ?? 10) < 3;
+      await Promise.all(Array.from({ length: slow ? 1 : 4 }, worker)); ensure(); schedule();
     };
-    const onP4 = (p: number) => { cur = p * (N - 1); vis = ss(0, 0.1, p); canvas.style.opacity = String(vis); canvas.style.visibility = vis > 0 ? 'visible' : 'hidden'; if (vis > 0) { void load(); ensure(); schedule(); } };
+    const onP4 = (p: number) => { cur = Math.max(0, (p-handoffFade)/(1-handoffFade)) * (N - 1); vis = ss(0, handoffFade, p); canvas.style.opacity = String(vis); canvas.style.visibility = vis > 0 ? 'visible' : 'hidden'; if (vis > 0) { void load(); ensure(); schedule(); } };
     const early = () => { if (scene02Progress.ref.current > 0.4 || scene03Progress.ref.current > 0) void load(); };
     const off1 = scene04Progress.subscribe(onP4), off2 = scene02Progress.subscribe(early), off3 = scene03Progress.subscribe(early); onP4(scene04Progress.ref.current); early();
     return () => { dead = true; off1(); off2(); off3(); ro.disconnect(); if (raf) cancelAnimationFrame(raf); bmps.forEach(b => b.close()); bmps.clear(); };

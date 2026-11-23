@@ -1,4 +1,5 @@
 'use client';
+import { asset } from '@/lib/asset';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -9,7 +10,6 @@ import { ATMO_FRAG, BORDER_FRAG, BORDER_VERT, CLOUD_BAKE_FRAG, CLOUD_BAKE_VERT, 
 import { drive, fitCamera, playAll } from '@/lib/glbOps';
 import { createV3Effects, type V3Fx } from './v3Effects';
 import type { Variant } from '@/lib/recon/variant';
-import { asset } from '@/lib/asset';
 
 export type ReconStats = { fps: number; avgMs: number; p95Ms: number; maxMs: number; spikes33: number; frames: number; calls: number; triangles: number; geometries: number; textures: number; programs: number; maxTex: number; gpu: string; camera: string; tier: string; quality: string };
 declare global { interface Window { __recon?: { stats: () => ReconStats | null; ready: boolean; timings: Record<string, number>; resetFrames: () => void; log: unknown[]; renderer?: THREE.WebGLRenderer } } }

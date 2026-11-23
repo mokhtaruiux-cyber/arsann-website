@@ -32,7 +32,7 @@ export function SiteHeader({ lang }: { lang: Lang }) {
     <header className="s01-header">
       <a className="s01-skip" href="#s01-main">{d.skip}</a>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <a href={asset(`/${lang}/`)} className="s01-logo" aria-label={d.brand}><img src={asset('/brand/arsann-lockup-reverse.provisional.svg')} alt={d.brand} width={121} height={48} data-provisional="true" /></a>
+      <a href={`/${lang}`} className="s01-logo" aria-label={d.brand}><img src={asset("/brand/arsann-lockup-reverse.provisional.svg")} alt={d.brand} width={121} height={48} data-provisional="true" /></a>
       <nav aria-label={lang === 'en' ? 'Main' : 'الرئيسية'} className="s01-nav"><ul>{items}</ul></nav>
       <div className="s01-header-end">
         <LanguageSwitcher lang={lang} />

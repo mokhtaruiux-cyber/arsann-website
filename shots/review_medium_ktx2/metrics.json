@@ -1,0 +1,52 @@
+{
+ "tier": "medium",
+ "fmt": "ktx2",
+ "results": [
+  {
+   "p": 0,
+   "maeR": 3.2,
+   "maeG": 3,
+   "maeB": 3.8,
+   "mae": 3.3,
+   "lumBlender": 30.7,
+   "lumWeb": 31.4
+  },
+  {
+   "p": 40,
+   "maeR": 7.1,
+   "maeG": 7.3,
+   "maeB": 8.2,
+   "mae": 7.5,
+   "lumBlender": 76.3,
+   "lumWeb": 79.3
+  },
+  {
+   "p": 65,
+   "maeR": 7.7,
+   "maeG": 8.3,
+   "maeB": 9.4,
+   "mae": 8.5,
+   "lumBlender": 107.5,
+   "lumWeb": 111.6
+  },
+  {
+   "p": 85,
+   "maeR": 6.1,
+   "maeG": 7.4,
+   "maeB": 9.3,
+   "mae": 7.6,
+   "lumBlender": 110.5,
+   "lumWeb": 115.8
+  },
+  {
+   "p": 100,
+   "maeR": 5.6,
+   "maeG": 7.1,
+   "maeB": 9.1,
+   "mae": 7.3,
+   "lumBlender": 113,
+   "lumWeb": 117.7
+  }
+ ],
+ "errs": []
+}

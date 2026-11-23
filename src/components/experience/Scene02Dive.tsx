@@ -1,10 +1,10 @@
 'use client';
+import { asset } from '@/lib/asset';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { asset } from '@/lib/asset';
 
-/** Scene 02 "The Dive" browser review. Terrain = GLB exported from scenes/scene-02-heritage-desert/dive/scene02_dive.blend; camera/world keys = /data/scene02_path.json.
+/** Scene 02 "The Dive" browser review. Terrain = GLB exported from scenes/scene-02-the-dive/scene02_dive.blend; camera/world keys = /data/scene02_path.json.
  *  Sand, sky, haze, clouds, arcs and the neon name are rebuilt live (same look as the Blender stills). Query: ?p=0.5 fixes progress, ?autoplay=0 stops playback. */
 const ss = (a: number, b: number, x: number) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const noiseGlsl = `float hash(vec3 p){ p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
@@ -92,38 +92,40 @@ export function Scene02Dive({ progressRef, activeRef, onReady }: { progressRef: 
     // clouds: camera-parented sheet
     const cloudMat = new THREE.ShaderMaterial({ vertexShader: CLOUD_VERT, fragmentShader: CLOUD_FRAG, transparent: true, depthTest: false, depthWrite: false, uniforms: { uAmt: { value: 1 }, uTime: { value: 0 }, uAspect: { value: 1.78 } } });
     const cloud = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), cloudMat); cloud.position.z = -1; cloud.renderOrder = 20; cloud.frustumCulled = false; cam.add(cloud);
-    const roadMat = new THREE.ShaderMaterial({ uniforms: { uK: { value: 0 } }, vertexShader: 'void main(){ gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }', fragmentShader: 'uniform float uK; void main(){ gl_FragColor = vec4(vec3(5.0) * uK, 1.0);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}', polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }); const road = new THREE.Group(); road.visible = false; world.add(road); let roadReady = false;
-    const chars = new THREE.Group(); chars.visible = false; fx.add(chars); let keys: Key[] = []; let ready = false; const resize = () => { const w = Math.max(2, el.clientWidth), h = Math.max(2, el.clientHeight); renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix(); }; resize(); window.addEventListener('resize', resize);
-    Promise.all([fetch(asset('/data/scene02_path.json')).then(r => r.json()), new GLTFLoader().loadAsync(asset('/models/scene02/terrain.glb')), new GLTFLoader().loadAsync(asset('/models/scene02/characters.glb')), new GLTFLoader().loadAsync(asset('/models/scene02/road.glb'))]).then(([path, gltf, cg, rd]) => {
-      rd.scene.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.material = roadMat; m.frustumCulled = false; } }); road.add(rd.scene); roadReady = true;
+    // The dive ends at the desert landing. Scene03HorseCanvas owns all character and road shots.
+    let keys: Key[] = []; let ready = false; const resize = () => { const w = Math.max(2, el.clientWidth), h = Math.max(2, el.clientHeight); renderer.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix(); }; resize(); window.addEventListener('resize', resize);
+    Promise.all([fetch(asset('/data/scene02_path.json')).then(r => r.json()), new GLTFLoader().loadAsync(asset('/models/scene02/terrain.glb'))]).then(([path, gltf]) => {
       keys = path.keys; gltf.scene.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.material = sandMat; m.frustumCulled = false; } }); world.add(gltf.scene);
-      cg.scene.traverse(o => { const m = o as THREE.Mesh; if (m.isMesh) { m.frustumCulled = false; const mt = m.material as THREE.MeshStandardMaterial; if (mt && mt.isMeshStandardMaterial) { mt.envMapIntensity = 0; mt.roughness = Math.max(mt.roughness, 0.35); if (/Rope/.test(o.name)) mt.color.set(0x5a4030); if (/Object_121/.test(o.name)) { mt.map = null; mt.color.set(0x1b130f); mt.roughness = 0.42; mt.needsUpdate = true; } if (/Object_119/.test(o.name)) { mt.map = null; mt.color.set(0x0a0706); mt.needsUpdate = true; } } } });
-      chars.add(cg.scene);
       // Warm-up while the canvas is still invisible: compile every shader (async, non-blocking), then draw one frame with everything visible so geometry + textures are uploaded before the first scroll into the dive.
       const idle = () => new Promise<void>(res => { const w = window as unknown as { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => void }; if (w.requestIdleCallback) w.requestIdleCallback(() => res(), { timeout: 1500 }); else setTimeout(res, 60); });
       const warm = async () => { try { await idle();
-        const rv = road.visible, cv = chars.visible, clv = cloud.visible; road.visible = chars.visible = cloud.visible = true;
+        const clv = cloud.visible; cloud.visible = true;
         await renderer.compileAsync(scene, cam); await idle(); for (const t of [sandU.uCol.value, sandU.uNrm.value, sandU.uRgh.value]) renderer.initTexture(t);
         await idle(); renderer.render(scene, cam);
-        road.visible = rv; chars.visible = cv; cloud.visible = clv;
+        cloud.visible = clv;
       } catch { /* warm-up is an optimisation only */ } ready = true; onReady?.(); };
       void warm();
     }).catch(() => { /* the poster stays; Scene 2 simply does not appear */ });
     const qa = new THREE.Quaternion(), qb = new THREE.Quaternion(), qP = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2), v = new THREE.Vector3(); let raf = 0; const t0 = performance.now(); const clock = { getElapsedTime: () => (performance.now() - t0) / 1000 };
+    let lastRenderedProgress = -1;
     const frame = () => {
-      raf = requestAnimationFrame(frame); if (activeRef && !activeRef.current) return; if (!ready) return;
-      const U = Math.min(1, Math.max(0, progressRef.current ?? 0)); const f = U * 360; const u = Math.min(1, f / 240); const dk = 0; /* daylight edit: no dusk */ const i = Math.min(keys.length - 2, Math.floor(f / 4)); const t = f / 4 - i; const A = keys[i], B = keys[i + 1];
+      raf = requestAnimationFrame(frame); if (!ready) return;
+      const U = Math.min(1, Math.max(0, progressRef.current ?? 0));
+      // Even on a fast scroll jump, render the correct landing frame once before pausing.
+      if (activeRef && !activeRef.current && (U === 0 || U === lastRenderedProgress)) return;
+      const f = U * 240; const u = U; const dk = 0; /* daylight edit: no dusk */ const i = Math.min(keys.length - 2, Math.floor(f / 4)); const t = f / 4 - i; const A = keys[i], B = keys[i + 1];
       v.set(A.pos[0] + (B.pos[0] - A.pos[0]) * t, A.pos[1] + (B.pos[1] - A.pos[1]) * t, A.pos[2] + (B.pos[2] - A.pos[2]) * t); cam.position.copy(v);
       qa.set(A.quat[0], A.quat[1], A.quat[2], A.quat[3]); qb.set(B.quat[0], B.quat[1], B.quat[2], B.quat[3]); cam.quaternion.copy(qa).slerp(qb, t); cam.quaternion.premultiply(qP);
-      const portraitZoom = Math.min(2.4, Math.max(1, 0.55 * (16 / 9) / cam.aspect));   // phones: narrow the view so the man and horse stay a readable size
+      const portraitZoom = Math.min(2.4, Math.max(1, 0.55 * (16 / 9) / cam.aspect));   // Preserve the dive framing on portrait screens.
       const lens = (A.lens + (B.lens - A.lens) * t) * portraitZoom; const vf = 2 * Math.atan(36 / (2 * lens) / cam.aspect); cam.fov = THREE.MathUtils.radToDeg(vf); cam.updateProjectionMatrix();
-      const s = A.s + (B.s - A.s) * t, zs = A.zs + (B.zs - A.zs) * t; world.scale.set(s, zs, s); fx.scale.set(s, s, s); sandU.uScale.value.set(s, s, zs); sandU.uCam.value.copy(cam.position); sandU.uDens.value = 0.6 * 0.0016 / s; sandU.uDusk.value = dk; (sky.material as THREE.ShaderMaterial).uniforms.uDusk.value = dk; dl.intensity = 3.2 * (1 - dk) + 0.05; hemi.intensity = 0.9 + 0.5 * dk; hemi.color.setHex(dk > 0.5 ? 0x8f9cd8 : 0xb8c8f0); road.visible = roadReady && f >= 258; roadMat.uniforms.uK.value = ss(256, 330, f);
+      const s = A.s + (B.s - A.s) * t, zs = A.zs + (B.zs - A.zs) * t; world.scale.set(s, zs, s); fx.scale.set(s, s, s); sandU.uScale.value.set(s, s, zs); sandU.uCam.value.copy(cam.position); sandU.uDens.value = 0.6 * 0.0016 / s; sandU.uDusk.value = dk; (sky.material as THREE.ShaderMaterial).uniforms.uDusk.value = dk; dl.intensity = 3.2 * (1 - dk) + 0.05; hemi.intensity = 0.9 + 0.5 * dk; hemi.color.setHex(dk > 0.5 ? 0x8f9cd8 : 0xb8c8f0);
       arcCore.uniforms.uTime.value = clock.getElapsedTime(); arcCore.uniforms.uProg.value = u; arcCore.uniforms.uFade.value = 1 - ss(120 / 240, 165 / 240, u);
       const amtF = f < 24 ? 0.95 : f < 56 ? 0.9 + (0.28 - 0.9) * (f - 24) / 32 : f < 110 ? 0.28 + (0.18 - 0.28) * (f - 56) / 54 : f < 150 ? 0.18 * (1 - (f - 110) / 40) : 0;
-      cloudMat.uniforms.uAmt.value = amtF * 0.95 + 0.1; cloudMat.uniforms.uTime.value = clock.getElapsedTime(); cloudMat.uniforms.uAspect.value = cam.aspect; cloud.visible = f < 156; chars.visible = f >= 166;
+      cloudMat.uniforms.uAmt.value = amtF * 0.95 + 0.1; cloudMat.uniforms.uTime.value = clock.getElapsedTime(); cloudMat.uniforms.uAspect.value = cam.aspect; cloud.visible = f < 156;
       const h = 2 * Math.tan(vf / 2); cloud.scale.set(h * cam.aspect * 1.4, h * 1.2, 1); cloud.position.z = -1; sky.position.copy(cam.position);
       const L = label.current; if (L) { const alt = cam.position.y; const wp = new THREE.Vector3(0, GZ * s, 0).project(cam); const vis = ss(0.16, 0.22, u) * ss(120, 520, alt) * (wp.z < 1 ? 1 : 0); L.style.opacity = String(vis); L.style.transform = `translate3d(${((wp.x * 0.5 + 0.5) * el.clientWidth).toFixed(1)}px, ${((-wp.y * 0.5 + 0.5) * el.clientHeight).toFixed(1)}px, 0)`; }
       renderer.render(scene, cam);
+      lastRenderedProgress = U;
       // adaptive resolution: keeps the dive near 60 fps on slower GPUs / big screens (drops 0.2 at a time, recovers slowly)
       const now = performance.now(), dt = now - lastT; lastT = now; if (dt < 100) { accT += dt; accN++; if (accN >= 45) { const avg = accT / accN; accT = 0; accN = 0; if (avg > 24 && dpr > 0.85) { dpr = Math.max(0.85, dpr - 0.2); renderer.setPixelRatio(dpr); resize(); } else if (avg < 15 && dpr < maxDpr) { dpr = Math.min(maxDpr, dpr + 0.1); renderer.setPixelRatio(dpr); resize(); } } }
     };

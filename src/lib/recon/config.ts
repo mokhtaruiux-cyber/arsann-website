@@ -1,5 +1,5 @@
-import * as THREE from 'three';
 import { asset } from '@/lib/asset';
+import * as THREE from 'three';
 export const R = 6.371;
 export const NOTEX_GLB = asset('/models/scene01/scene01_origin.notex.glb');
 /** v3 (PM edits 17 Nov 2026): camera ends on Madinah, no Saudi border. Legacy look keeps NOTEX_GLB + camera_path.json. */

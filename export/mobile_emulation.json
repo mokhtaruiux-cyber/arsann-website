@@ -1,0 +1,42 @@
+[
+ {
+  "name": "iphone-emulated",
+  "readyMs": 917,
+  "tier": "low",
+  "quality": "low",
+  "timings": {
+   "tex_low_ms": 146,
+   "bake_low_ms": 127,
+   "firstAssetsMs": 304,
+   "compileMs": 34
+  },
+  "longTasksMs": [
+   127
+  ],
+  "dpr": 3,
+  "viewportW": 390,
+  "pointerCoarse": true,
+  "fpsEmulatedOnDesktopGpu": 58.7,
+  "errs": []
+ },
+ {
+  "name": "maxtex2048-desktop",
+  "readyMs": 689,
+  "tier": "low",
+  "quality": "low",
+  "timings": {
+   "tex_low_ms": 55,
+   "bake_low_ms": 4,
+   "firstAssetsMs": 107,
+   "compileMs": 14
+  },
+  "longTasksMs": [
+   88
+  ],
+  "dpr": 1,
+  "viewportW": 1280,
+  "pointerCoarse": false,
+  "fpsEmulatedOnDesktopGpu": 60,
+  "errs": []
+ }
+]

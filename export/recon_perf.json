@@ -1,0 +1,343 @@
+{
+ "at": "2026-11-15T12:57:53.544Z",
+ "chrome": "system Chrome headless (Metal)",
+ "results": [
+  {
+   "tier": "high",
+   "fmt": "ktx2",
+   "progressive": "1",
+   "readyMs": 792,
+   "cold": {
+    "timings": {
+     "tex_low_ms": 150,
+     "bake_low_ms": 4,
+     "firstAssetsMs": 213,
+     "compileMs": 0,
+     "tex_high_ms": 403,
+     "bake_high_ms": 2,
+     "upgradeMs": 483
+    },
+    "quality": "high",
+    "maxGapSinceReady": 17,
+    "gapsOver50SinceReady": 0,
+    "maxGapEver": 67,
+    "gapsOver50Ever": 1,
+    "longTasks": []
+   },
+   "transferKB": [
+    {
+     "n": "scene01_origin.notex.glb",
+     "kb": 932
+    },
+    {
+     "n": "day_global_4096.etc1s.ktx2",
+     "kb": 612
+    },
+    {
+     "n": "night_global_4096.etc1s.ktx2",
+     "kb": 329
+    },
+    {
+     "n": "landmask_2048.webp",
+     "kb": 30
+    },
+    {
+     "n": "basis_transcoder.js",
+     "kb": 15
+    },
+    {
+     "n": "basis_transcoder.wasm",
+     "kb": 242
+    },
+    {
+     "n": "day_global_4096.ktx2",
+     "kb": 3907
+    },
+    {
+     "n": "night_global_4096.ktx2",
+     "kb": 2244
+    },
+    {
+     "n": "landmask_2048.webp",
+     "kb": 0
+    },
+    {
+     "n": "day_region_3584.ktx2",
+     "kb": 10799
+    }
+   ],
+   "totalTexKB": 17921,
+   "idle": {
+    "fps": 60,
+    "p95": 16.9,
+    "max": 17,
+    "spikes33": 0,
+    "calls": 8,
+    "tris": 84840,
+    "geo": 25,
+    "tex": 8,
+    "programs": 18
+   },
+   "scroll": {
+    "fps": 60,
+    "p95": 17.3,
+    "max": 23.2,
+    "spikes33": 0,
+    "endPct": "scroll 0%",
+    "midPct": "scroll 100%",
+    "longTasks": 0,
+    "maxGap": 17
+   },
+   "gpuProcessRssMB": 172,
+   "errors": []
+  },
+  {
+   "tier": "high",
+   "fmt": "ktx2",
+   "progressive": "0",
+   "readyMs": 916,
+   "cold": {
+    "timings": {
+     "tex_high_ms": 270,
+     "bake_high_ms": 3,
+     "firstAssetsMs": 352,
+     "compileMs": 15
+    },
+    "quality": "high",
+    "maxGapSinceReady": 17,
+    "gapsOver50SinceReady": 0,
+    "maxGapEver": 152,
+    "gapsOver50Ever": 1,
+    "longTasks": [
+     [
+      92,
+      70
+     ]
+    ]
+   },
+   "transferKB": [
+    {
+     "n": "scene01_origin.notex.glb",
+     "kb": 932
+    },
+    {
+     "n": "day_global_4096.ktx2",
+     "kb": 3907
+    },
+    {
+     "n": "night_global_4096.ktx2",
+     "kb": 2244
+    },
+    {
+     "n": "landmask_2048.webp",
+     "kb": 30
+    },
+    {
+     "n": "day_region_3584.ktx2",
+     "kb": 10799
+    },
+    {
+     "n": "basis_transcoder.js",
+     "kb": 15
+    },
+    {
+     "n": "basis_transcoder.wasm",
+     "kb": 242
+    }
+   ],
+   "totalTexKB": 16980,
+   "idle": {
+    "fps": 60,
+    "p95": 17.5,
+    "max": 18,
+    "spikes33": 0,
+    "calls": 8,
+    "tris": 84840,
+    "geo": 25,
+    "tex": 7,
+    "programs": 18
+   },
+   "scroll": {
+    "fps": 60,
+    "p95": 17.8,
+    "max": 18.6,
+    "spikes33": 0,
+    "endPct": "scroll 0%",
+    "midPct": "scroll 100%",
+    "longTasks": 0,
+    "maxGap": 17
+   },
+   "gpuProcessRssMB": 164,
+   "errors": []
+  },
+  {
+   "tier": "medium",
+   "fmt": "ktx2",
+   "progressive": "1",
+   "readyMs": 787,
+   "cold": {
+    "timings": {
+     "tex_low_ms": 142,
+     "bake_low_ms": 4,
+     "firstAssetsMs": 197,
+     "compileMs": 0,
+     "tex_medium_ms": 295,
+     "bake_medium_ms": 2,
+     "upgradeMs": 363
+    },
+    "quality": "medium",
+    "maxGapSinceReady": 17,
+    "gapsOver50SinceReady": 0,
+    "maxGapEver": 151,
+    "gapsOver50Ever": 1,
+    "longTasks": [
+     [
+      92,
+      77
+     ]
+    ]
+   },
+   "transferKB": [
+    {
+     "n": "scene01_origin.notex.glb",
+     "kb": 932
+    },
+    {
+     "n": "day_global_4096.etc1s.ktx2",
+     "kb": 612
+    },
+    {
+     "n": "night_global_4096.etc1s.ktx2",
+     "kb": 329
+    },
+    {
+     "n": "landmask_2048.webp",
+     "kb": 30
+    },
+    {
+     "n": "basis_transcoder.js",
+     "kb": 15
+    },
+    {
+     "n": "basis_transcoder.wasm",
+     "kb": 242
+    },
+    {
+     "n": "day_global_4096.ktx2",
+     "kb": 3907
+    },
+    {
+     "n": "night_global_4096.etc1s.ktx2",
+     "kb": 0
+    },
+    {
+     "n": "landmask_2048.webp",
+     "kb": 0
+    },
+    {
+     "n": "day_region_2048.ktx2",
+     "kb": 3749
+    }
+   ],
+   "totalTexKB": 8627,
+   "idle": {
+    "fps": 60,
+    "p95": 17.3,
+    "max": 17.9,
+    "spikes33": 0,
+    "calls": 8,
+    "tris": 84840,
+    "geo": 25,
+    "tex": 8,
+    "programs": 18
+   },
+   "scroll": {
+    "fps": 60,
+    "p95": 17.4,
+    "max": 19.4,
+    "spikes33": 0,
+    "endPct": "scroll 0%",
+    "midPct": "scroll 100%",
+    "longTasks": 0,
+    "maxGap": 17
+   },
+   "gpuProcessRssMB": 154,
+   "errors": []
+  },
+  {
+   "tier": "low",
+   "fmt": "ktx2",
+   "progressive": "1",
+   "readyMs": 834,
+   "cold": {
+    "timings": {
+     "tex_low_ms": 134,
+     "bake_low_ms": 3,
+     "firstAssetsMs": 193,
+     "compileMs": 14
+    },
+    "quality": "low",
+    "maxGapSinceReady": 17,
+    "gapsOver50SinceReady": 0,
+    "maxGapEver": 139,
+    "gapsOver50Ever": 1,
+    "longTasks": [
+     [
+      169,
+      55
+     ]
+    ]
+   },
+   "transferKB": [
+    {
+     "n": "scene01_origin.notex.glb",
+     "kb": 932
+    },
+    {
+     "n": "day_global_4096.etc1s.ktx2",
+     "kb": 612
+    },
+    {
+     "n": "night_global_4096.etc1s.ktx2",
+     "kb": 329
+    },
+    {
+     "n": "landmask_2048.webp",
+     "kb": 30
+    },
+    {
+     "n": "basis_transcoder.js",
+     "kb": 15
+    },
+    {
+     "n": "basis_transcoder.wasm",
+     "kb": 242
+    }
+   ],
+   "totalTexKB": 971,
+   "idle": {
+    "fps": 60,
+    "p95": 17,
+    "max": 17.4,
+    "spikes33": 0,
+    "calls": 8,
+    "tris": 84840,
+    "geo": 25,
+    "tex": 6,
+    "programs": 18
+   },
+   "scroll": {
+    "fps": 60,
+    "p95": 17.3,
+    "max": 20,
+    "spikes33": 0,
+    "endPct": "scroll 0%",
+    "midPct": "scroll 100%",
+    "longTasks": 0,
+    "maxGap": 17
+   },
+   "gpuProcessRssMB": 136,
+   "errors": []
+  }
+ ]
+}

@@ -1,0 +1,225 @@
+{
+ "env": {
+  "browser": "157.0.8103.52",
+  "cpu": "Apple M2 Pro"
+ },
+ "viewer": {
+  "timeToStatsReadyMs": 821,
+  "nav": {
+   "dcl": 20,
+   "load": 214
+  },
+  "glb": {
+   "n": "scene01_origin.glb",
+   "transfer": 9829694,
+   "decoded": 11632356,
+   "dur": 265
+  },
+  "jsTransferKB": 401,
+  "stats": {
+   "fps": 55.8,
+   "avgMs": 17.93,
+   "p95Ms": 16.8,
+   "maxMs": 681.3,
+   "spikes33": 2,
+   "frames": 514,
+   "calls": 23,
+   "triangles": 70740,
+   "geometries": 23,
+   "textures": 3,
+   "maxTex": 16384,
+   "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2 Pro, Unspecified Version)",
+   "camera": "PerspectiveCamera fov=35.0 pos=0.00,6.00,26.00"
+  },
+  "perfMetrics": {
+   "Nodes": 224,
+   "LayoutCount": 25,
+   "TaskDuration": 9,
+   "JSHeapUsedSize": 35271984
+  },
+  "chromeProcessRssMB": 539
+ },
+ "scroll": {
+  "forward": {
+   "pct": "scroll 100%",
+   "y": 5400,
+   "h": 5400
+  },
+  "backAfterReverse": {
+   "pct": "scroll 0%",
+   "y": 0
+  },
+  "samples": [
+   {
+    "i": 0,
+    "pct": "scroll 1%"
+   },
+   {
+    "i": 6,
+    "pct": "scroll 22%"
+   },
+   {
+    "i": 12,
+    "pct": "scroll 51%"
+   },
+   {
+    "i": 18,
+    "pct": "scroll 80%"
+   },
+   {
+    "i": 24,
+    "pct": "scroll 98%"
+   },
+   {
+    "i": 30,
+    "pct": "scroll 100%"
+   },
+   {
+    "i": 36,
+    "pct": "scroll 100%"
+   },
+   {
+    "i": 42,
+    "pct": "scroll 100%"
+   },
+   {
+    "i": 48,
+    "pct": "scroll 100%"
+   },
+   {
+    "i": 54,
+    "pct": "scroll 100%"
+   }
+  ],
+  "longTasksMs": [],
+  "stats": {
+   "fps": 60,
+   "avgMs": 16.66,
+   "p95Ms": 17.5,
+   "maxMs": 18.2,
+   "spikes33": 0,
+   "frames": 600,
+   "calls": 23,
+   "triangles": 70740,
+   "geometries": 23,
+   "textures": 3,
+   "maxTex": 16384,
+   "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2 Pro, Unspecified Version)",
+   "camera": "CAM_SCENE01 fov=28.4 pos=25.41,15.00,-5.40"
+  },
+  "scrollingMs": 11309
+ },
+ "dispose": {
+  "whileOpen": {
+   "geometries": 23,
+   "textures": 3
+  },
+  "log": [
+   {
+    "t": 1794744705460,
+    "phase": "canvas-unmount-before-dispose",
+    "memory": {
+     "geometries": 0,
+     "textures": 1
+    }
+   },
+   {
+    "t": 1794744706634,
+    "phase": "after-1s",
+    "memory": {
+     "geometries": 23,
+     "textures": 3
+    },
+    "contextLost": false
+   }
+  ],
+  "jsHeapMB": 94
+ },
+ "cameraFidelity": [
+  {
+   "p": 0,
+   "glb": [
+    25.41,
+    15,
+    -5.4
+   ],
+   "blenderPath": [
+    25.41,
+    15,
+    -5.4
+   ],
+   "maxAbsErr": 0.003
+  },
+  {
+   "p": 0.15,
+   "glb": [
+    20.72,
+    13.78,
+    -7.54
+   ],
+   "blenderPath": [
+    20.72,
+    13.78,
+    -7.54
+   ],
+   "maxAbsErr": 0.002
+  },
+  {
+   "p": 0.4,
+   "glb": [
+    7.97,
+    9.37,
+    -6.69
+   ],
+   "blenderPath": [
+    7.97,
+    9.37,
+    -6.69
+   ],
+   "maxAbsErr": 0.002
+  },
+  {
+   "p": 0.65,
+   "glb": [
+    5.73,
+    6.68,
+    -5.53
+   ],
+   "blenderPath": [
+    5.73,
+    6.68,
+    -5.53
+   ],
+   "maxAbsErr": 0.005
+  },
+  {
+   "p": 0.85,
+   "glb": [
+    5.24,
+    5.53,
+    -5.33
+   ],
+   "blenderPath": [
+    5.24,
+    5.53,
+    -5.33
+   ],
+   "maxAbsErr": 0.002
+  },
+  {
+   "p": 1,
+   "glb": [
+    5.09,
+    5.05,
+    -5.27
+   ],
+   "blenderPath": [
+    5.09,
+    5.05,
+    -5.27
+   ],
+   "maxAbsErr": 0.004
+  }
+ ],
+ "consoleErrors": []
+}
